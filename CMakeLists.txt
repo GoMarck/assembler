@@ -7,11 +7,13 @@ project (assembler
   LANGUAGES C
 )
 
+set (CMAKE_C_COMPILER "/usr/bin/gcc")
+
 # Add common flags
 # -std=gnu99: use gnu99 standard
 set (CMAKE_C_FLAGS "-std=gnu99")
-# Treat warning as error
-set (CMAKE_C_FLAGS "-Werror")
+# -Werror: treat warning as error
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 
 file (GLOB_RECURSE SRCS RELATIVE ${CMAKE_SOURCE_DIR} "src/*.c")
 
