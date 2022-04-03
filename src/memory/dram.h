@@ -9,8 +9,8 @@
 
 uint8_t mem[MEM_SIZE];
 
-uint64_t dram_read(void *paddr);
+uint64_t dram_read(void *addr);
 
-void dram_write(void *paddr, uint64_t data);
+void dram_write(void *addr, uint64_t data);
 
 #endif
