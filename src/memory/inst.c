@@ -18,7 +18,7 @@ static void pop_handler(uint64_t src, uint64_t dst);
 // init instruction handler table.
 void init_handler_table()
 {
-    handler_table[MOV] = move_handler;
+    handler_table[MOV_IMM_MEM] = move_handler;
     handler_table[CALL] = call_handler;
     handler_table[RET] = ret_handler;
     handler_table[PUSH] = push_handler;
@@ -27,7 +27,7 @@ void init_handler_table()
 
 static uint64_t decode_od(od_t *od)
 {
-    uint64_t val;
+    uint64_t val = 0;
     if (od->type == IMM) {
         val = od->imm;
     } else if (od->type == REG) {

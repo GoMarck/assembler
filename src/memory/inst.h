@@ -7,6 +7,7 @@
 
 typedef enum OPERAND_TYPE_ENUM
 {
+    NUL,
     IMM,
     REG,
     MEM
@@ -25,7 +26,11 @@ typedef struct OPERAND_STRUNCT
 // define opeartion. e.g. MOV, CALL...
 typedef enum OPRATION_ENUM
 {
-    MOV,
+    MOV_IMM_REG,
+    MOV_MEM_REG,
+    MOV_REG_REG,
+    MOV_IMM_MEM,
+    MOV_REG_MEM,
     ADD,
     CALL,
     RET,
