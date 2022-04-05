@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.1)
 
 project (assembler
-  VERSION 0.0.0
+  VERSION 0.1.0
   HOMEPAGE_URL https://github.com/GoMarck/assembler
   DESCRIPTION "C implementation of the assembler emulator"
   LANGUAGES C
