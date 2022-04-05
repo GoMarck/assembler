@@ -14,7 +14,7 @@ inst_t program[INST_LEN] = {
     { { REG, 0, 0, &reg.rsi, NULL }, { MEM, -0x20, 0, &reg.rbp, NULL }, MOV_REG_MEM, "mov    \%rsi,-0x20(\%rbp)" },
     { { MEM, -0x18, 0, &reg.rbp, NULL }, { REG, 0, 0, &reg.rdx, NULL }, MOV_MEM_REG, "mov    -0x18(\%rbp),\%rdx" },
     { { MEM, -0x20, 0, &reg.rbp, NULL }, { REG, 0, 0, &reg.rax, NULL }, MOV_MEM_REG, "mov    -0x20(\%rbp),\%rax" },
-    { { REG, 0, 0, &reg.rdx, NULL }, { REG, 0, 0, &reg.rax, NULL }, ADD, "add    \%rdx,\%rax" },
+    { { REG, 0, 0, &reg.rdx, NULL }, { REG, 0, 0, &reg.rax, NULL }, ADD_REG_REG, "add    \%rdx,\%rax" },
     { { REG, 0, 0, &reg.rax, NULL }, { MEM, -0x8, 0, &reg.rbp, NULL }, MOV_REG_MEM, "mov    \%rax,-0x8(\%rbp)" },
     { { MEM, -0x8, 0, &reg.rbp, NULL }, { REG, 0, 0, &reg.rax, NULL }, MOV_MEM_REG, "mov    -0x8(\%rbp),\%rax" },
     { { REG, 0, 0, &reg.rbp, NULL }, { NUL, 0, 0, NULL, NULL }, POP, "pop    \%rbp" },

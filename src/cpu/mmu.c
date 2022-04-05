@@ -2,7 +2,7 @@
 
 #include "memory/dram.h"
 
-void *va2pa(void *vaddr)
+uint64_t va2pa(uint64_t vaddr)
 {
-    return (void *)((uint64_t)vaddr % MEM_SIZE);
+    return vaddr % MEM_SIZE;
 }

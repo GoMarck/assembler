@@ -6,6 +6,6 @@
 
 #include <stdint.h>
 
-void *va2pa(void *vaddr);
+uint64_t va2pa(uint64_t vaddr);
 
 #endif

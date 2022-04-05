@@ -1,0 +1,24 @@
+rax            0x800114e           134222158
+rbx            0x8001190           134222224
+rcx            0x8001190           134222224
+rdx            0x7ffffffee388      140737488282504
+rsi            0x7ffffffee378      140737488282488
+rdi            0x1                 1
+rbp            0x7ffffffee280      0x7ffffffee280
+rsp            0x7ffffffee260      0x7ffffffee260
+r8             0x0                 0
+r9             0x7fffff7c1d50      140737479712080
+r10            0x7                 7
+r11            0x2                 2
+r12            0x8001040           134221888
+r13            0x7ffffffee370      140737488282480
+r14            0x0                 0
+r15            0x0                 0
+rip            0x800115a           0x800115a <main+12>
+eflags         0x206               [ PF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0

@@ -31,7 +31,7 @@ typedef enum OPRATION_ENUM
     MOV_REG_REG,
     MOV_IMM_MEM,
     MOV_REG_MEM,
-    ADD,
+    ADD_REG_REG,
     CALL,
     RET,
     PUSH,
@@ -49,5 +49,8 @@ typedef struct INSTRUCTION_STRUCT
 
 // init instruction handler table.
 void init_handler_table();
+
+// parse instruction and effect cpu register and memory.
+void parse_inst();
 
 #endif
