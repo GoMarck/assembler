@@ -55,6 +55,8 @@ Its assembly instructions are show as follow:
 I manually parsed its assembly instructions and simply simulated the state of its CPU and memory. And it has been success.
 ## TODO List
 Based on the features we have implemented, we want to implement these features in the future:
+- Find a favorite C programming specification and follow it.
+- We need a story folder to place some design documents.
 - Refactor the project to make the hierarchy more reasonable.
 - Implement an instruction set string parsing state machine.
 - Implement SRAM cache function.
