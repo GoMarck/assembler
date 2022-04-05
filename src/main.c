@@ -24,7 +24,7 @@ int main()
     init_handler_table();
     init_reg();
     init_mem();
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 20; ++i) {
         parse_inst();
         print_reg();
         print_mem();
