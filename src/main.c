@@ -7,17 +7,28 @@
 
 extern inst_t program[20];
 
+// init register state
 void init_reg();
+
+// init memory state
 void init_mem();
+
+// print register state
 void print_reg();
+
+// print memory state around rsp
 void print_mem();
 
 int main()
 {
+    init_handler_table();
     init_reg();
     init_mem();
-    print_reg();
-    print_mem();
+    for (int i = 0; i < 6; ++i) {
+        parse_inst();
+        print_reg();
+        print_mem();
+    }
     return 0;
 }
 

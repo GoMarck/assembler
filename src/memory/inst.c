@@ -2,7 +2,9 @@
 
 #include <stdio.h>
 
+#include "cpu/mmu.h"
 #include "cpu/reg.h"
+#include "memory/dram.h"
 
 #define OP_SIZE 11
 
@@ -43,8 +45,9 @@ void parse_inst()
     inst_t *inst = (inst_t *)reg.rip;
     uint64_t src = decode_od(&inst->src);
     uint64_t dst = decode_od(&inst->dst);
-    handler_table[inst->op](src, dst);
-    reg.rip += sizeof(inst_t);
+    handler_t handler = handler_table[inst->op];
+    handler(src, dst);
+    printf("%s\n", inst->dsp);
 }
 
 static uint64_t decode_od(od_t *od)
@@ -75,19 +78,22 @@ static void mov_imm_reg_handler(uint64_t src, uint64_t dst)
 // mov instruction implementation
 static void mov_mem_reg_handler(uint64_t src, uint64_t dst)
 {
-    printf("Unsupport implemenatation: mov\n");
+    *(uint64_t *)dst = dram_read(va2pa(src));
+    reg.rip += sizeof(inst_t);
 }
 
 // mov instruction implementation
 static void mov_reg_reg_handler(uint64_t src, uint64_t dst)
 {
-    printf("Unsupport implemenatation: mov\n");
+    *(uint64_t *)dst = *(uint64_t *)src;
+    reg.rip += sizeof(inst_t);
 }
 
 // mov instruction implementation
 static void mov_imm_mem_handler(uint64_t src, uint64_t dst)
 {
-    printf("Unsupport implemenatation: mov\n");
+    dram_write(va2pa(dst), src);
+    reg.rip += sizeof(inst_t);
 }
 
 // mov instruction implementation

@@ -26,7 +26,7 @@ inst_t program[INST_LEN] = {
     { { MEM, -0x18, 0, &reg.rbp, NULL }, { REG, 0, 0, &reg.rax, NULL }, MOV_MEM_REG, "mov    -0x18(\%rbp),\%rax" },
     { { REG, 0, 0, &reg.rdx, NULL }, { REG, 0, 0, &reg.rsi, NULL }, MOV_REG_REG, "mov    \%rdx,\%rsi" },
     { { REG, 0, 0, &reg.rax, NULL }, { REG, 0, 0, &reg.rdi, NULL }, MOV_REG_REG, "mov    \%rax,\%rdi" },
-    { { IMM, (int64_t)&program, 0, NULL, NULL }, { NUL, 0, 0, NULL, NULL }, CALL, "callq  1129 <add>" },
+    { { IMM, (int64_t)&program, 0, NULL, NULL }, { NUL, 0, 0, NULL, NULL }, CALL, "callq  0x8001129 <add>" },
     { { REG, 0, 0, &reg.rax, NULL }, { MEM, -0x8, 0, &reg.rbp, NULL }, MOV_REG_MEM, "mov    \%rax,-0x8(\%rbp)" },
     { { IMM, 0, 0, NULL, NULL }, { REG, 0, 0, &reg.rax, NULL }, MOV_IMM_REG, "mov    $0x0,\%eax" }
 };
