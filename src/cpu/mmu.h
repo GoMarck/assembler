@@ -1,8 +1,8 @@
 // memory manager unit
 #pragma once
 
-#ifndef _ASSEMBLER_CPU_MMU_H_
-#define _ASSEMBLER_CPU_MMU_H_
+#ifndef ASSEMBLER_CPU_MMU_H
+#define ASSEMBLER_CPU_MMU_H
 
 #include <stdint.h>
 

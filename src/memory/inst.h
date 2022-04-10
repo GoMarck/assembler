@@ -1,51 +1,42 @@
 #pragma once
 
-#ifndef _ASSEMBLER_MEMORY_INST_H_
-#define _ASSEMBLER_MEMORY_INST_H_
+#ifndef ASSEMBLER_MEMORY_INST_H
+#define ASSEMBLER_MEMORY_INST_H
 
 #include <stdint.h>
 
-typedef enum OPERAND_TYPE_ENUM
-{
-    NUL,
-    IMM,
-    REG,
-    MEM
-} od_type_t;
+typedef enum OperandType { NUL, IMM, REG, MEM } OperandType;
 
 // define operand.
-typedef struct OPERAND_STRUNCT
-{
-    od_type_t type;
-    int64_t imm;
-    int64_t scal;
-    uint64_t *reg_b; // base register
-    uint64_t *reg_i; // index register
-} od_t;
+typedef struct Operand {
+  OperandType type;
+  int64_t imm;
+  int64_t scal;
+  uint64_t *reg_b;  // base register
+  uint64_t *reg_i;  // index register
+} Operand;
 
 // define opeartion. e.g. MOV, CALL...
-typedef enum OPRATION_ENUM
-{
-    MOV_IMM_REG,
-    MOV_MEM_REG,
-    MOV_REG_REG,
-    MOV_IMM_MEM,
-    MOV_REG_MEM,
-    ADD_REG_REG,
-    CALL,
-    RET,
-    PUSH,
-    POP
-} op_t;
+typedef enum Operation {
+  MOV_IMM_REG,
+  MOV_MEM_REG,
+  MOV_REG_REG,
+  MOV_IMM_MEM,
+  MOV_REG_MEM,
+  ADD_REG_REG,
+  CALL,
+  RET,
+  PUSH,
+  POP
+} Operation;
 
 // define instruction. e.g. mov %rdx, %rdi
-typedef struct INSTRUCTION_STRUCT
-{
-    od_t src;
-    od_t dst;
-    op_t op;
-    char dsp[100];
-} inst_t;
+typedef struct Instruction {
+  Operand src;
+  Operand dst;
+  Operation op;
+  char code[100];
+} Instruction;
 
 // init instruction handler table.
 void init_handler_table();

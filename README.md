@@ -2,8 +2,10 @@
 ## What is Assembler
 Assembler is a very simple emulator, just for fun. Its implementation theory is derived from the book CSAPP (CMU 15-213).
 
+The project obey the Google C/C++ style guide
+
 The project is reference from: [yangminz
-/bcst_csapp](https://github.com/yangminz/bcst_csapp). Thanks to [yangminz](https://github.com/yangminz), I learn a lot from the project and his lesson in [bilibili](https://space.bilibili.com/4564101/video).
+/bcst_csapp](https://github.com/yangminz/bcst_csapp). Thanks to [yangminz](https://github.com/yangminz), I learn a lot from the project and his lesson in [bilibili](https://space.bilibili.com/4564101/video). And we obey the [Google C++ style guide](https://google.github.io/styleguide/cppguide.html).
 
 ## What I achieved
 I have successfully implement an assembler emulator to parse a very simple C codes:
@@ -55,8 +57,9 @@ Its assembly instructions are show as follow:
 I manually parsed its assembly instructions and simply simulated the state of its CPU and memory. And it has been success.
 ## TODO List
 Based on the features we have implemented, we want to implement these features in the future:
-- Find a favorite C programming specification and follow it.
-- We need a story folder to place some design documents.
+- ~~Find a favorite C style guide and follow it.~~
+- ~~We need a story folder to place some design documents.~~
+- Find a C ut framework to test the codes.
 - Refactor the project to make the hierarchy more reasonable.
 - Implement an instruction set string parsing state machine.
 - Implement SRAM cache function.
@@ -82,3 +85,9 @@ int main()
     return 0;
 }
 ```
+
+## Some useful link
+- [Google C++ style guide [EN]](https://google.github.io/styleguide/cppguide.html)
+- [Google C++ style guide [CN]](https://zh-google-styleguide.readthedocs.io/en/latest/)
+- [CMU CSAPP Lessons]()
+- [Assembler Lessons](https://space.bilibili.com/4564101/video)

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _ASSEMBLER_MEMORY_DRAM_H_
-#define _ASSEMBLER_MEMORY_DRAM_H_
+#ifndef ASSEMBLER_MEMORY_DRAM_H
+#define ASSEMBLER_MEMORY_DRAM_H
 
 #include <stdint.h>
 
