@@ -20,6 +20,71 @@
 - 动态链接库具有位置无关的特点
 
 ## 2. 可重定位目标文件
+可重定位目标文件（object file）由编译器和汇编器生成，在 Linux 和 Unix 系统中以 ELF 格式进行存储。ELF 全称为 Executable and Linkable Format，即*可执行可链接格式*。
+
+### 2.1 ELF 格式存储的可重定位目标文件
+典型的 ELF 可重定位目标文件如下图所示：
+![ELF](image/Linking_elf.png)
+
+|类型|描述|
+|--|--|
+|ELF header|前16个字节序列描述了生成该文件的系统的字的大小和字节顺序。剩余部分则包含了帮助链接器语法分析和解释目标文件的信息，包括 ELF header 的大小、目标文件类型（可重定位的、可执行的、共享的）、机器类型、section header table 的文件偏移以及 section header table 中 entry 的数量和大小等|
+|Section header table|不同 section 的位置和大小是由 section header table 进行描述的，其中目标文件中每个节都有一个固定大小的 entry|
+|.text|已编译程序的机器代码|
+|.rodata|read only data，例如 printf 语句中的格式字符串和 switch 语句的跳转表|
+|.data|已初始化的全局和静态 C 变量|
+|.bss|未初始化的全局和静态 C 变量，以及所有被初始化为 0 的全局或静态变量。在目标文件中这个 section 仅作为占位符存在而不占据实际空间用以优化空间效率|
+|.symtab|符号表，用于存放程序中定义和引用的函数和全局变量的信息|
+|.rel.text|.text 中位置的列表，当链接器把这个目标文件和其他文件组合时，需要修改这些位置|
+|.rel.data|被模块引用或定义的所有全局变量的重定位信息。一般而言，任何已初始化的全局变量，如果它的初始值是一个全局变量地址或者外部定义函数地址，都需要被修改|
+|.debug|调试符号表，以 -g 编译程序的时候才会得到这张表|
+|.line|原始 C 源程序中的行号与 .text 段机器码的映射，以 -g 编译程序的时候才会得到这张表|
+|.strtab|字符串表，内容包括 .symtab 和 .debug 中的符号表，以及 section header table 中的 section 名字。它是以 null 结尾的字符串序列|
+
+### 2.2 可重定位目标文件的符号和符号表
+每一个可重定位目标模块 m 都有一个符号表，它包含模块本身定义和引用的符号的信息，这些符号可分为以下三类：
+|类别|描述|
+|--|--|
+|m 定义的全局符号|这些符号由 m 定义并被其他模块引用，对应非静态的 C 函数和全局变量|
+|m 引用的全局符号|这些符号定义在其他模块中但被 m 引用，又称为外部符号。对应在其他模块中定义的非静态的 C 函数和全局变量|
+|m 定义和引用的局部符号|对应带 static 属性的 C 函数和全局变量。这些符号在 m 中任何位置均可见，但是不能被其他模块引用|
+
+符号表由汇编器构造。.symtab 节中包含 ELF 符号表，这张符号表包含了一个 entry 数组，entry 的结构如下：
+```c
+typedef struct {
+    int   name;      /* String table offset */
+    char  type:4,    /* Function or data (4 bits) */
+          binding:4; /* Local or global (4 bits) */
+    char  reserved;  /* Unused */
+    short section;   /* Section header index */
+    long  value;     /* Section offset or absolute address */
+    long  size;      /* Object size in bytes */
+} Elf64_Symbol;
+```
+字段的具体描述如下表：
+|字段|描述|
+|--|--|
+|name|字符串表 .strtab 中的字节偏移，指向符号的以 null 结尾的字符出的名字|
+|value|指向符号表的地址。对于可重定位目标模块来说，value 是一个相对定义目标的 section 的起始位置的偏移；对于可执行目标文件来说，改值是一个运行时的绝对地址|
+|size|目标的大小|
+|type|表示数据或函数|
+|binding|表示符号是本地的还是全局的|
+|section|表示符号属于哪个 section 索引|
+
+对于这些记录在 .symtab 的符号来说，它们都被分配在目标文件的某个 section 当中，由 srction 字段表示，该字段是一个到 section header table 的索引。
+
+而有一部分 entry 它们的 section 字段比较特殊，为 ABS/UNDEF/COMMON，这些被称为伪节（preudosection），因为它们在 section header table 中不存在 entry。
+
+|定义|描述|
+|--|--|
+|ABS|表示不该被重定位的符号|
+|UNDEF|表示未定义的符号，即在本模块中引用却定义在其他模块|
+|COMMON|表示还未被分配位置的未初始化的数据目标|
+
+需要注意的是伪节只在可重定位目标文件中存在，而可执行目标文件不存在伪节。
+
+### 2.3 可重定位目标文件的符号解析
+
 - object file的内容简介
 - 符号、符号表的定义、符号解析
 - linker解析多重定义符号的规则
