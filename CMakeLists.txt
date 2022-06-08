@@ -27,3 +27,7 @@ file (GLOB_RECURSE SRCS RELATIVE ${CMAKE_SOURCE_DIR} "src/*.c")
 add_executable (assembler ${SRCS})
 
 target_include_directories (assembler PUBLIC ${CMAKE_SOURCE_DIR}/src)
+
+
+add_executable(assembler_test test/example/example_test.c)
+target_include_directories(assembler_test PRIVATE ${CMAKE_SOURCE_DIR}/test/include)
