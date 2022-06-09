@@ -20,7 +20,7 @@ static const char *test_status_str(test_status_t status) {
   }
 }
 
-static void test_result_print(const char *format, ...) {
+void test_print(const char *format, ...) {
   va_list ap;
 
   va_start(ap, format);
@@ -37,7 +37,7 @@ void test_init(const char *name) {
 
 void test_finish() {
   ++test_counts[test_status];
-  test_result_print("%s: %s\n", test_name, test_status_str(test_status));
+  test_print("%s: %s\n", test_name, test_status_str(test_status));
 }
 
 test_status_t test_core(test_t *t, ...) {
@@ -53,7 +53,7 @@ test_status_t test_core(test_t *t, ...) {
     }
   }
 
-  test_result_print("--- %s: %u/%u, %s: %u/%u, %s: %u/%u ---\n",
+  test_print("--- %s: %u/%u, %s: %u/%u, %s: %u/%u ---\n",
                     test_status_str(test_status_pass),
                     test_counts[test_status_pass], test_count,
                     test_status_str(test_status_skip),
