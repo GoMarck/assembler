@@ -10,7 +10,7 @@ project (assembler
 set (CMAKE_C_COMPILER "/usr/bin/gcc")
 
 option (FAIL_ON_WARNING "Build fail if meets compile warning" ON)
-option (WITH_TEST "Build unit test codes" OFF)
+option (WITH_TEST "Build unit test codes" ON)
 
 # Add common flags
 # -std=gnu99: use gnu99 standard
@@ -28,6 +28,8 @@ add_executable (assembler ${SRCS})
 
 target_include_directories (assembler PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
-
-add_executable(assembler_test test/example/example_test.c)
-target_include_directories(assembler_test PRIVATE ${CMAKE_SOURCE_DIR}/test/include)
+if (WITH_TEST)
+  # we need to have an function to generate the ctest testcases.
+  add_executable(assembler_test test/example/example_test.c test/src/test_internal.c)
+  target_include_directories(assembler_test PRIVATE ${CMAKE_SOURCE_DIR}/test/include)
+endif ()

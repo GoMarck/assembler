@@ -1,4 +1,4 @@
-#include "test/test.h"
+#include "test/test_internal.h"
 
 #include <stdio.h>
 
@@ -40,6 +40,10 @@ void test_finish() {
   test_print("%s: %s\n", test_name, test_status_str(test_status));
 }
 
+void test_fail() { 
+  test_status = test_status_fail; 
+}
+
 test_status_t test_core(test_t *t, ...) {
   test_status_t ret = test_status_pass;
   va_list ap;
@@ -54,12 +58,11 @@ test_status_t test_core(test_t *t, ...) {
   }
 
   test_print("--- %s: %u/%u, %s: %u/%u, %s: %u/%u ---\n",
-                    test_status_str(test_status_pass),
-                    test_counts[test_status_pass], test_count,
-                    test_status_str(test_status_skip),
-                    test_counts[test_status_skip], test_count,
-                    test_status_str(test_status_fail),
-                    test_counts[test_status_fail], test_count);
+             test_status_str(test_status_pass), test_counts[test_status_pass],
+             test_count, test_status_str(test_status_skip),
+             test_counts[test_status_skip], test_count,
+             test_status_str(test_status_fail), test_counts[test_status_fail],
+             test_count);
 
   va_end(ap);
   return ret;
