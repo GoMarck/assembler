@@ -56,7 +56,7 @@
 #define ASSERT_EQ(a, b) \
   VERIFY_EQ(true, "Assertion", a, b)
 
-#define VERIFY_STR_EQ(assert, str, a, b) \
+#define VERIFY_STR_EQ(assert, str, a, b)                      \
   do {                                                        \
     if (strcmp((a), (b))) {                                   \
       test_print("%s:%s:%d: Failed %s: "                      \
@@ -70,9 +70,9 @@
     }                                                         \
   } while (0)
 
-#define VERIFY_STR_NE(assert, str, a, b) \
+#define VERIFY_STR_NE(assert, str, a, b)                      \
   do {                                                        \
-    if (!strcmp((a), (b))) {                                   \
+    if (!strcmp((a), (b))) {                                  \
       test_print("%s:%s:%d: Failed %s: "                      \
         "(%s) == (%s) --> \"%s\" vs \"%s\"\n",                \
         __func__, __FILE__, __LINE__,                         \
