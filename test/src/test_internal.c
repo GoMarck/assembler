@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#define BUF_SIZE 8 * 1024
+
 static unsigned int test_count = 0;
 static test_status_t test_counts[3] = {0, 0, 0};
 static test_status_t test_status = test_status_pass;
@@ -23,9 +25,11 @@ static const char *test_status_str(test_status_t status) {
 void test_print(const char *format, ...) {
   va_list ap;
 
+  char buf[BUF_SIZE] = {0};
   va_start(ap, format);
   // now we only print result to stderr, maybe we can add some color?
-  fprintf(stderr, format, ap);
+  vsprintf(buf, format, ap);
+  fprintf(stderr, "%s", buf);
   va_end(ap);
 }
 
@@ -40,9 +44,7 @@ void test_finish() {
   test_print("%s: %s\n", test_name, test_status_str(test_status));
 }
 
-void test_fail() { 
-  test_status = test_status_fail; 
-}
+void test_fail() { test_status = test_status_fail; }
 
 test_status_t test_core(test_t *t, ...) {
   test_status_t ret = test_status_pass;
