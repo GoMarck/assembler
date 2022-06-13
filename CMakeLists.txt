@@ -29,6 +29,8 @@ add_executable (assembler ${SRCS})
 target_include_directories (assembler PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 if (WITH_TEST)
+  include(CTest)
+  enable_testing()
   # we need to have an function to generate the ctest testcases.
   add_executable(assembler_test test/example/example_test.c test/src/test_internal.c)
   target_include_directories(assembler_test PRIVATE ${CMAKE_SOURCE_DIR}/test/include)

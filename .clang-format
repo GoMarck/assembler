@@ -108,15 +108,12 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 200
 PointerAlignment: Left
 RawStringFormats:
-  - Language:        Cpp
+  - Language:        C
     Delimiters:
-      - cc
-      - CC
-      - cpp
-      - Cpp
-      - CPP
-      - 'c++'
-      - 'C++'
+      - c
+      - C
+      - 'c'
+      - 'C'
     CanonicalDelimiter: ''
     BasedOnStyle:    google
   - Language:        TextProto

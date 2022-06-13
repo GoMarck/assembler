@@ -142,10 +142,10 @@ typedef struct Register {
 
 // Marcos for read or write condition codes
 //
-//    * CF_{R|W}: Read or write CF flag
-//    * ZF_{R|W}: Read or write ZF flag
-//    * SF_{R|W}: Read or write SF flag
-//    * OF_{R|W}: Read or write OF flag
+//    * CF_{RD|WR}: Read or write CF flag
+//    * ZF_{RD|WR}: Read or write ZF flag
+//    * SF_{RD|WR}: Read or write SF flag
+//    * OF_{RD|WR}: Read or write OF flag
 //
 // Condition code registers describing attributes of the
 // most recent arithmetic or logical operation:
@@ -165,14 +165,14 @@ typedef struct Register {
 //    * SF   (t < 0)                                Negative
 //    * OF   (a < 0 == b < 0) && (t < 0 != a < 0)   Signed overflow
 
-#define CF_R(cp) BOOL((cp)->codes & 0x1)
-#define CF_W(cp, flag) ((cp)->codes | BYTE(BOOL(flag)))
-#define ZF_R(cp) BOOL((cp)->codes & 0x10)
-#define ZF_W(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x1))
-#define SF_R(cp) BOOL((cp)->codes & 0x100)
-#define SF_W(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x10))
-#define OF_R(cp) BOOL((cp)->codes & 0x1000)
-#define OF_W(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x100))
+#define CF_RD(cp) BOOL((cp)->codes & 0x1)
+#define CF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)))
+#define ZF_RD(cp) BOOL((cp)->codes & 0x10)
+#define ZF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x1))
+#define SF_RD(cp) BOOL((cp)->codes & 0x100)
+#define SF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x10))
+#define OF_RD(cp) BOOL((cp)->codes & 0x1000)
+#define OF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x100))
 
 typedef struct Core {
   Register reg;    // a set of 16 general-purpose registers
