@@ -7,6 +7,8 @@ project (assembler
   LANGUAGES C
 )
 
+include(cmake/util.cmake)
+
 set (CMAKE_C_COMPILER "/usr/bin/gcc")
 
 option (FAIL_ON_WARNING "Build fail if meets compile warning" ON)
@@ -22,16 +24,20 @@ if (FAIL_ON_WARNING)
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 endif ()
 
-file (GLOB_RECURSE SRCS RELATIVE ${CMAKE_SOURCE_DIR} "src/*.c")
+include_directories (${CMAKE_SOURCE_DIR}/src)
+
+set (SRCS
+  src/cpu/mmu.c
+  src/disk/code.c
+  src/memory/dram.c
+  src/memory/inst.c
+  src/main.c)
 
 add_executable (assembler ${SRCS})
 
-target_include_directories (assembler PUBLIC ${CMAKE_SOURCE_DIR}/src)
-
 if (WITH_TEST)
-  include(CTest)
-  enable_testing()
-  # we need to have an function to generate the ctest testcases.
-  add_executable(assembler_test test/example/example_test.c test/src/test_internal.c)
-  target_include_directories(assembler_test PRIVATE ${CMAKE_SOURCE_DIR}/test/include)
+  include (CTest)
+  enable_testing ()
+  # add cpu test.
+  ADD_ASSEMBLER_TEST (cpu-test SRC_FILES src/cpu/cpu-test.c)
 endif ()

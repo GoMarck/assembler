@@ -13,5 +13,5 @@ TEST_BEGIN(test_gp_register_bit) {
 TEST_END
 
 int main(void) {
-  return RUN_TESTS(test_register_bit); 
+  return RUN_TESTS(test_gp_register_bit); 
 }
