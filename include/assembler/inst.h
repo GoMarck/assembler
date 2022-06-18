@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef ASSEMBLER_MEMORY_INST_H
-#define ASSEMBLER_MEMORY_INST_H
+#ifndef ASSEMBLER_INST_H
+#define ASSEMBLER_INST_H
 
 #include <stdint.h>
 
@@ -44,4 +44,4 @@ void init_handler_table();
 // parse instruction and effect cpu register and memory.
 void parse_inst();
 
-#endif
+#endif  // ASSEMBLER_INST_H

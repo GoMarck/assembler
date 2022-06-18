@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef ASSEMBLER_CPU_CPU_H
-#define ASSEMBLER_CPU_CPU_H
+#ifndef ASSEMBLER_CPU_H
+#define ASSEMBLER_CPU_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -182,4 +182,4 @@ typedef struct Core {
 
 Core core;
 
-#endif  // end ASSEMBLER_CPU_CPU_H
+#endif  // ASSEMBLER_CPU_H

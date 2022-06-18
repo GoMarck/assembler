@@ -24,7 +24,7 @@ if (FAIL_ON_WARNING)
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 endif ()
 
-include_directories (${CMAKE_SOURCE_DIR}/src)
+include_directories (${CMAKE_SOURCE_DIR}/include)
 
 set (SRCS
   src/cpu/mmu.c

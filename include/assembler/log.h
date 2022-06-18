@@ -1,9 +1,10 @@
 #pragma once
 
-#ifndef ASSEMBLER_UTIL_LOG_H
-#define ASSEMBLER_UTIL_LOG_H
+#ifndef ASSEMBLER_LOG_H
+#define ASSEMBLER_LOG_H
 
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef enum LogLevel {
   VERBOSE = 0,
@@ -27,12 +28,12 @@ char message_text[MAX_LOG_MESSAGE_LEN + 1];
 #define LOG_TO_STDERR(level, ...)                                       \
   do {                                                                  \
     if (level < LOG_LEVEL) {                                            \
-      return;                                                           \
+      break;                                                           \
     }                                                                   \
     log_to_stderr(message_prefix, sizeof(message_prefix), "%s %s:%d] ", \
                   level_to_str(level), __FILE__, __LINE__);             \
     log_to_stderr(message_text, sizeof(message_text), __VA_ARGS__);     \
-    log_to_stderr("\n");                                                \
+    log_tail("\n");                                                     \
     if (level == FATAL) {                                               \
       abort();                                                          \
     }                                                                   \
@@ -51,7 +52,7 @@ char message_text[MAX_LOG_MESSAGE_LEN + 1];
 #define LOG(level, ...) STDERR_LOG_##level(__VA_ARGS__)
 
 const char *level_to_str(LogLevel level);
-void log_to_stderr(const char *buf, size_t len, const char *format, ...);
-void log_to_stderr(const char *buf);
+void log_to_stderr(char *buf, size_t len, const char *format, ...);
+void log_tail(const char *buf);
 
-#endif  // ASSEMBLER_UTIL_LOG_H
+#endif  // ASSEMBLER_LOG_H
