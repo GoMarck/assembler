@@ -44,4 +44,30 @@ void init_handler_table();
 // parse instruction and effect cpu register and memory.
 void parse_inst();
 
+// Parse string into instruction set. There are two parts combine to an
+// instruction: operation and operand. The forms of the operation parsed
+// are shown as follow:
+//
+//    * mov, add, sub, call, ret, push, pop, jmp
+//
+// And the forms of the operand parsed are shown as follow:
+//
+// | Type      | Form           | Operand value          | Name                |
+// |-----------+----------------+------------------------+---------------------|
+// | Immediate | $Imm           | Imm                    | Immediate           |
+// | Register  | r_a            | R[r_a]                 | Register            |
+// | Memory    | Imm            | M[Imm]                 | Absolute            |
+// | Memory    | (r_a)          | M[R[r_a]]              | Indirect            |
+// | Memory    | Imm(r_b)       | M[Imm+R[r_b]]          | Base + displacement |
+// | Memory    | (r_b,r_i)      | M[R[r_b]+R[r_i]]       | Indexed             |
+// | Memory    | Imm(r_b,r_i)   | M[Imm+R[r_b]+R[r_i]]   | Indexed             |
+// | Memory    | (,r_i,s)       | M[R[r_i]*s]            | Scaled indexed      |
+// | Memory    | Imm(,r_i,s)    | M[Imm+R[r_i]*s]        | Scaled indexed      |
+// | Memory    | (r_b,r_i,s)    | M[R[r_b]+R[r_i]*s]     | Scaled indexed      |
+// | Memory    | Imm(r_b,r_i,s) | M[Imm+R[r_b]+R[r_i]*s] | Scaled indexed      |
+//
+// @param[in] str The instruction string to be parsed.
+// @param[out] inst The parsed instruction is output here.
+void parse_inst_str(const char *str, Instruction *inst);
+
 #endif  // ASSEMBLER_INST_H

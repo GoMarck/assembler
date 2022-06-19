@@ -1,10 +1,10 @@
-#include "memory/inst.h"
+#include "assembler/inst.h"
 
 #include <stdio.h>
 
-#include "cpu/mmu.h"
-#include "cpu/reg.h"
-#include "memory/dram.h"
+#include "assembler/mmu.h"
+#include "assembler/reg.h"
+#include "assembler/dram.h"
 
 #define OP_SIZE 11
 
@@ -126,4 +126,16 @@ static void pop_handler(uint64_t src, uint64_t dst) {
   *(uint64_t *)src = dram_read(va2pa(reg.rsp));
   reg.rsp += 0x8;
   reg.rip += sizeof(Instruction);
+}
+
+void parse_inst_str(const char *str, Instruction *inst) {
+
+}
+
+static void parse_operand_str(const char *str, Operand *operand) {
+
+}
+
+static void parse_operation_str(const char *str, Operation *op) {
+  
 }
