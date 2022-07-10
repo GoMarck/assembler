@@ -3,10 +3,18 @@
 #include <stdio.h>
 
 #include "assembler/mmu.h"
-#include "assembler/reg.h"
+#include "assembler/cpu.h"
 #include "assembler/dram.h"
 
 #define OP_SIZE 11
+
+void parse_inst_str(const char *str, Instruction *inst) {
+  
+}
+
+static void parse_operand_str(const char *str, Operand *operand) {}
+
+static void parse_operation_str(const char *str, Operation *op) {}
 
 typedef void (*handler_t)(uint64_t, uint64_t);
 
@@ -126,16 +134,4 @@ static void pop_handler(uint64_t src, uint64_t dst) {
   *(uint64_t *)src = dram_read(va2pa(reg.rsp));
   reg.rsp += 0x8;
   reg.rip += sizeof(Instruction);
-}
-
-void parse_inst_str(const char *str, Instruction *inst) {
-
-}
-
-static void parse_operand_str(const char *str, Operand *operand) {
-
-}
-
-static void parse_operation_str(const char *str, Operation *op) {
-  
 }

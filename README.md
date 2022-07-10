@@ -59,7 +59,7 @@ I manually parsed its assembly instructions and simply simulated the state of it
 Based on the features we have implemented, we want to implement these features in the future:
 - ~~Find a favorite C style guide and follow it.~~
 - ~~We need a story folder to place some design documents.~~
-- Find a C ut framework to test the codes.
+- ~~Find a C ut framework to test the codes.~~
 - Refactor the project to make the hierarchy more reasonable.
 - Implement an instruction set string parsing state machine.
 - Implement SRAM cache function.

@@ -35,7 +35,7 @@ typedef struct Instruction {
   Operand src;
   Operand dst;
   Operation op;
-  char code[100];
+  const char *code;
 } Instruction;
 
 // init instruction handler table.

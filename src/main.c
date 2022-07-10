@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#include "cpu/mmu.h"
-#include "cpu/reg.h"
-#include "memory/dram.h"
-#include "memory/inst.h"
+#include "assembler/mmu.h"
+#include "assembler/cpu.h"
+#include "assembler/dram.h"
+#include "assembler/inst.h"
 
 extern Instruction program[20];
 

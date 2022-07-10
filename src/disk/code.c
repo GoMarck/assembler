@@ -1,7 +1,7 @@
 #include <string.h>
 
-#include "cpu/reg.h"
-#include "memory/inst.h"
+#include "assembler/cpu.h"
+#include "assembler/inst.h"
 
 #define INST_LEN 20
 
