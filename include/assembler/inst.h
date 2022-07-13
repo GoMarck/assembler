@@ -48,7 +48,7 @@ void parse_inst();
 // instruction: operation and operand. The forms of the operation parsed
 // are shown as follow:
 //
-//    * mov, add, sub, call, ret, push, pop, jmp
+//    * mov, add, sub, call, ret, push, pop, jmp, jne
 //
 // And the forms of the operand parsed are shown as follow:
 //

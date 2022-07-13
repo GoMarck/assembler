@@ -7,8 +7,6 @@ project (assembler
   LANGUAGES C
 )
 
-set (CMAKE_C_COMPILER "/usr/bin/gcc")
-
 option (FAIL_ON_WARNING "Build fail if meets compile warning" ON)
 option (WITH_TEST "Build unit test codes" ON)
 
