@@ -3143,6 +3143,8 @@ static size_t traverse_and_check(mstate m);
   ((mchunkptr)(((char*)(p)) + (s)))->head |= PINUSE_BIT)
 
 /* Set cinuse and pinuse of this chunk and pinuse of next chunk */
+// 1. 将自己与上一个 chunk 的标志位设置为使用中（因为不可能存在相邻的两个空闲的内存块，因此上一个内存块一定存于使用中）
+// 2. 将下一个内存块的标志位设置为上一个内存块（自己）正在使用中
 #define set_inuse_and_pinuse(M,p,s)\
   ((p)->head = (s|PINUSE_BIT|CINUSE_BIT),\
   ((mchunkptr)(((char*)(p)) + (s)))->head |= PINUSE_BIT)
@@ -4593,11 +4595,14 @@ static void* tmalloc_small(mstate m, size_t nb) {
   tchunkptr t, v;
   size_t rsize;
   bindex_t i;
+  // 找到第一个不为空的箱子即是满足 nb 大小的，因为 nb 的大小必然是小于 256 的，
+  // 因此 treemap 中只要有空闲的 chunk 块都属于满足大小的 chunk 块。
   binmap_t leastbit = least_bit(m->treemap);
   compute_bit2idx(leastbit, i);
   v = t = *treebin_at(m, i);
   rsize = chunksize(t) - nb;
 
+  // 找到一个满足要求的最小的 chunk（尽量向左子树找）
   while ((t = leftmost_child(t)) != 0) {
     size_t trem = chunksize(t) - nb;
     if (trem < rsize) {
@@ -4610,10 +4615,13 @@ static void* tmalloc_small(mstate m, size_t nb) {
     mchunkptr r = chunk_plus_offset(v, nb);
     assert(chunksize(v) == rsize + nb);
     if (RTCHECK(ok_next(v, r))) {
+      // 将 chunk 从树中移除
       unlink_large_chunk(m, v);
       if (rsize < MIN_CHUNK_SIZE)
+        // 剩余空间太小，全部分配出去
         set_inuse_and_pinuse(m, v, (rsize + nb));
       else {
+        // 进行内存分割，剩余空间作为 dv chunk 
         set_size_and_pinuse_of_inuse_chunk(m, v, nb);
         set_size_and_pinuse_of_free_chunk(r, rsize);
         replace_dv(m, r, rsize);
@@ -4659,53 +4667,72 @@ void* dlmalloc(size_t bytes) {
   if (!PREACTION(gm)) {
     void* mem;
     size_t nb;
+    // MAX_SMALL_REQUEST = 256 bytes - chunk overhead
     if (bytes <= MAX_SMALL_REQUEST) {
       bindex_t idx;
       binmap_t smallbits;
+      // 将 bytes 做字节对齐，并算出对应的箱号
       nb = (bytes < MIN_REQUEST)? MIN_CHUNK_SIZE : pad_request(bytes);
       idx = small_index(nb);
       smallbits = gm->smallmap >> idx;
 
+      // 如果其对应或者临近的箱号具有可用的 chunk，说明我们命中了：
+      // smallbits 结果：
+      // - xxxx xx00: 对应及临近的箱号均无可用 chunk
+      // - xxxx xx01: 对应的箱号有 chunk，临近的箱号无 chunk
+      // - xxxx xx10: 对应的箱号无 chunk，临近的箱号有 chunk
+      // - xxxx xx11: 对应及临近的箱号均有可用 chunk
       if ((smallbits & 0x3U) != 0) { /* Remainderless fit to a smallbin. */
         mchunkptr b, p;
+        // 如果对应的箱号有可用 chunk，直接用对应箱号；否则用临近箱号（+1），非常巧妙的位运算
         idx += ~smallbits & 1;       /* Uses next bin if idx empty */
         b = smallbin_at(gm, idx);
         p = b->fd;
         assert(chunksize(p) == small_index2size(idx));
+        // 将箱子中的第一个 chunk 从双向链表中解开
         unlink_first_small_chunk(gm, b, p, idx);
         set_inuse_and_pinuse(gm, p, small_index2size(idx));
         mem = chunk2mem(p);
         check_malloced_chunk(gm, mem, nb);
+        // 这里需要注意的是即使使用的是临近箱子的 chunk，也就比期望申请的大小大 8 个字节，不需要做拆分
         goto postaction;
       }
 
       else if (nb > gm->dvsize) {
+        // dv chunk 块不够大，在所有空闲 chunk 块中寻找可分配的
         if (smallbits != 0) { /* Use chunk in next nonempty smallbin */
           mchunkptr b, p, r;
-          size_t rsize;
+          size_t rsize; /* Remain size after divid */
           bindex_t i;
+          // 计算出最小的，满足 bytes 的空闲 chunk
           binmap_t leftbits = (smallbits << idx) & left_bits(idx2bit(idx));
           binmap_t leastbit = least_bit(leftbits);
           compute_bit2idx(leastbit, i);
           b = smallbin_at(gm, i);
           p = b->fd;
           assert(chunksize(p) == small_index2size(i));
+          // 将 chunk 从双向链表中解出
           unlink_first_small_chunk(gm, b, p, i);
           rsize = small_index2size(i) - nb;
           /* Fit here cannot be remainderless if 4byte sizes */
           if (SIZE_T_SIZE != 4 && rsize < MIN_CHUNK_SIZE)
             set_inuse_and_pinuse(gm, p, small_index2size(i));
           else {
+            // 切分 chunk，重新设置 SIZE/PINUSE/CINUSE
             set_size_and_pinuse_of_inuse_chunk(gm, p, nb);
+            // 剩余的大小组成一个新的 chunk
             r = chunk_plus_offset(p, nb);
+            // 设置 SIZE/PINUSE 及其下一个 chunk 的 foot 信息（记录本 chunk 大小）
             set_size_and_pinuse_of_free_chunk(r, rsize);
+            // 将新 chunk 放置在 dv chunk 上，如果原有的 dv chunk 不为空，将原有的 chunk 放回
+            // smallbins 对应箱子的双向链表中作为空闲 chunk。注意 dv chunk 并不会被 smallbins 管理
             replace_dv(gm, r, rsize);
           }
           mem = chunk2mem(p);
           check_malloced_chunk(gm, mem, nb);
           goto postaction;
         }
-
+        // 在 smallbins 确实无法分配内存地情况下，尝试从 treemap 分配内存，nb 参数必定是小于 256 的
         else if (gm->treemap != 0 && (mem = tmalloc_small(gm, nb)) != 0) {
           check_malloced_chunk(gm, mem, nb);
           goto postaction;
@@ -4723,9 +4750,13 @@ void* dlmalloc(size_t bytes) {
     }
 
     if (nb <= gm->dvsize) {
+      // dv chunk 足够大，直接使用 dv chunk 分配内存。设置 dv chunk 的目的是优化连续的小内存分配请求，
+      // 例如在 Java/Python 等语言中，经常需要为对象连续分配小块内存，使用 dv chunk 则可以通过局部性
+      // 原理，更好地利用 cache line 机制，优化内存读写性能。
       size_t rsize = gm->dvsize - nb;
       mchunkptr p = gm->dv;
       if (rsize >= MIN_CHUNK_SIZE) { /* split dv */
+        // 将 dv chunk 继续进行分割
         mchunkptr r = gm->dv = chunk_plus_offset(p, nb);
         gm->dvsize = rsize;
         set_size_and_pinuse_of_free_chunk(r, rsize);
