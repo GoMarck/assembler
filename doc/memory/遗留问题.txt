@@ -1,0 +1,4 @@
+1. treebins 的 chunk 实际管理方式是什么样子的，如果进行关系对应
+2. sys_alloc 中如何将内存进行管理？
+3. segment 和 chunk 的关系是什么？不是很清晰？
+4. 一些位运算：least_bit、left_bits 等如何快速算出最小的满足的箱位
