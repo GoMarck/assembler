@@ -5,7 +5,7 @@
 
 #define INST_LEN 20
 
-Instruction program[INST_LEN] = {
+inst_t program[INST_LEN] = {
     // add
     {{REG, 0, 0, &core.reg.rbp, NULL},
      {NUL, 0, 0, NULL, NULL},

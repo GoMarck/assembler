@@ -48,7 +48,7 @@ typedef struct reg_t {
   REG_DEFINE(rsp, esp,  sp,   spl);
   REG_DEFINE(r8,  r8d,  r8w,  r8b);
   REG_DEFINE(r9,  r9d,  r9w,  r9b);
-  REG_DEFINE(r10, r1d,  r1w,  r1b);
+  REG_DEFINE(r10, r10d, r10w, r10b);
   REG_DEFINE(r11, r11d, r11w, r11b);
   REG_DEFINE(r12, r12d, r12w, r12b);
   REG_DEFINE(r13, r13d, r13w, r13b);

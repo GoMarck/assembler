@@ -2,18 +2,18 @@
 本篇文章阐述了 Assembler 如何对汇编指令集做解析。
 
 ## 0. 解析汇编指令集的意义
-Assembler 本质是一个汇编模拟器，因此它的内部定义了一个结构体 `Instruction` 用于保存用于模拟的指令集：
+Assembler 本质是一个汇编模拟器，因此它的内部定义了一个结构体 `inst_t` 用于保存用于模拟的指令集：
 ```c
 typedef enum OperandType { NUL, IMM, REG, MEM } OperandType;
 
 // define operand.
-typedef struct Operand {
+typedef struct operand_t {
   OperandType type;
   int64_t imm;
   int64_t scal;
   uint64_t *reg_b;  // base register
   uint64_t *reg_i;  // index register
-} Operand;
+} operand_t;
 
 // define opeartion. e.g. MOV, CALL...
 typedef enum Operation {
@@ -30,12 +30,12 @@ typedef enum Operation {
 } Operation;
 
 // define instruction. e.g. mov %rdx, %rdi
-typedef struct Instruction {
-  Operand src;
-  Operand dst;
+typedef struct inst_t {
+  operand_t src;
+  operand_t dst;
   Operation op;
   const char *code;
-} Instruction;
+} inst_t;
 ```
 例如对于 `push %rbp` 的模拟，可定义如下：
 ```c

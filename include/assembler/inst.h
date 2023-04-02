@@ -8,13 +8,13 @@
 typedef enum OperandType { NUL, IMM, REG, MEM } OperandType;
 
 // define operand.
-typedef struct Operand {
+typedef struct operand_t {
   OperandType type;
   int64_t imm;
   int64_t scal;
   uint64_t *reg_b;  // base register
   uint64_t *reg_i;  // index register
-} Operand;
+} operand_t;
 
 // define opeartion. e.g. MOV, CALL...
 typedef enum Operation {
@@ -31,12 +31,12 @@ typedef enum Operation {
 } Operation;
 
 // define instruction. e.g. mov %rdx, %rdi
-typedef struct Instruction {
-  Operand src;
-  Operand dst;
+typedef struct inst_t {
+  operand_t src;
+  operand_t dst;
   Operation op;
   const char *code;
-} Instruction;
+} inst_t;
 
 // init instruction handler table.
 void init_handler_table();
@@ -68,6 +68,8 @@ void parse_inst();
 //
 // @param[in] str The instruction string to be parsed.
 // @param[out] inst The parsed instruction is output here.
-void parse_inst_str(const char *str, Instruction *inst);
+void parse_instruction_str(const char *str, inst_t *inst);
+
+void parse_operand(const char *str, operand_t *operand);
 
 #endif  // ASSEMBLER_INST_H

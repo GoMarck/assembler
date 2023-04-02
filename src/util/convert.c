@@ -1,6 +1,5 @@
 #include "assembler/convert.h"
 
-#include <bits/stdint-uintn.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +17,7 @@ typedef enum num_type_t {
   HEX = 2
 } num_type_t;
 
-uint64_t
-str2uint64_range(const char *str, size_t beg, size_t end) {
+uint64_t str2uint64_range(const char *str, size_t beg, size_t end) {
   // We may meets the number string shown as follow:
   // - 1. (-)1234:   number expressed in decimal
   // - 2. (-)01234:  number expressed in octal
@@ -72,5 +70,5 @@ str2uint64_range(const char *str, size_t beg, size_t end) {
 
 fail_handle:
   printf("Parse string to number failed: %s\n", str);
-  exit(1);
+  abort();
 }

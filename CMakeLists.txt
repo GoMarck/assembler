@@ -33,6 +33,8 @@ set (SRCS
 
 add_executable (assembler ${SRCS})
 
+add_library(assembler_lib STATIC ${SRCS})
+
 ###################################################################
 #                            TEST ZONE                            #                        
 ###################################################################
@@ -98,6 +100,8 @@ if (WITH_TEST)
   enable_testing ()
   # add cpu test.
   ADD_ASSEMBLER_TEST (cpu-test SRC_FILES src/cpu/cpu-test.c)
+  # add instruction test.
+  ADD_ASSEMBLER_TEST (inst-test SRC_FILES src/memory/inst-test.c DEP_LIBS assembler_lib)
   # add convert test.
   ADD_ASSEMBLER_TEST (convert-test SRC_FILES src/util/convert-test.c src/util/convert.c src/util/log.c)
 endif ()
