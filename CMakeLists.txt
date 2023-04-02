@@ -27,6 +27,8 @@ set (SRCS
   src/disk/code.c
   src/memory/dram.c
   src/memory/inst.c
+  src/util/log.c
+  src/util/convert.c
   src/main.c)
 
 add_executable (assembler ${SRCS})
@@ -96,4 +98,6 @@ if (WITH_TEST)
   enable_testing ()
   # add cpu test.
   ADD_ASSEMBLER_TEST (cpu-test SRC_FILES src/cpu/cpu-test.c)
+  # add convert test.
+  ADD_ASSEMBLER_TEST (convert-test SRC_FILES src/util/convert-test.c src/util/convert.c src/util/log.c)
 endif ()

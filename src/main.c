@@ -7,6 +7,29 @@
 
 extern Instruction program[20];
 
+#define MAX_INSTRUCTION_SIZE 128
+
+char assembly[18][MAX_INSTRUCTION_SIZE] = {
+  "push   %rbp",
+  "mov    %rsp,%rbp",
+  "mov    %rdi,-0x18(%rbp)",
+  "mov    %rsi,-0x20(%rbp)",
+  "mov    -0x18(%rbp),%rdx",
+  "mov    -0x20(%rbp),%rax",
+  "add    %rdx,%rax",
+  "mov    %rax,-0x8(%rbp)",
+  "mov    -0x8(%rbp),%rax",
+  "movq   $0x12340000,-0x18(%rbp)",
+  "movq   $0xabcd,-0x10(%rbp)",
+  "mov    -0x10(%rbp),%rdx",
+  "mov    -0x18(%rbp),%rax",
+  "mov    %rdx,%rsi",
+  "mov    %rax,%rdi",
+  "callq  0",
+  "mov    %rax,-0x8(%rbp)",
+  "mov    $0x0,%eax"
+};
+
 // init register state
 void init_reg();
 
