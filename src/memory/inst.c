@@ -12,9 +12,9 @@ void parse_inst_str(const char *str, Instruction *inst) {
   
 }
 
-static void parse_operand_str(const char *str, Operand *operand) {}
+// static void parse_operand_str(const char *str, Operand *operand) {}
 
-static void parse_operation_str(const char *str, Operation *op) {}
+// static void parse_operation_str(const char *str, Operation *op) {}
 
 typedef void (*handler_t)(uint64_t, uint64_t);
 
@@ -47,7 +47,7 @@ void init_handler_table() {
 }
 
 void parse_inst() {
-  Instruction *inst = (Instruction *)reg.rip;
+  Instruction *inst = (Instruction *)core.rip;
   uint64_t src = decode_od(&inst->src);
   uint64_t dst = decode_od(&inst->dst);
   handler_t handler = handler_table[inst->op];
@@ -76,62 +76,62 @@ static uint64_t decode_od(Operand *od) {
 // mov instruction implementation
 static void mov_imm_reg_handler(uint64_t src, uint64_t dst) {
   *(uint64_t *)dst = src;
-  reg.rip += sizeof(Instruction);
+  core.rip += sizeof(Instruction);
 }
 
 // mov instruction implementation
 static void mov_mem_reg_handler(uint64_t src, uint64_t dst) {
   *(uint64_t *)dst = dram_read(va2pa(src));
-  reg.rip += sizeof(Instruction);
+  core.rip += sizeof(Instruction);
 }
 
 // mov instruction implementation
 static void mov_reg_reg_handler(uint64_t src, uint64_t dst) {
   *(uint64_t *)dst = *(uint64_t *)src;
-  reg.rip += sizeof(Instruction);
+  core.rip += sizeof(Instruction);
 }
 
 // mov instruction implementation
 static void mov_imm_mem_handler(uint64_t src, uint64_t dst) {
   dram_write(va2pa(dst), src);
-  reg.rip += sizeof(Instruction);
+  core.rip += sizeof(Instruction);
 }
 
 // mov instruction implementation
 static void mov_reg_mem_handler(uint64_t src, uint64_t dst) {
   dram_write(va2pa(dst), *(uint64_t *)src);
-  reg.rip += sizeof(Instruction);
+  core.rip += sizeof(Instruction);
 }
 
 // add instruction implementation
 static void add_reg_reg_handler(uint64_t src, uint64_t dst) {
   *(uint64_t *)dst += *(uint64_t *)src;
-  reg.rip += sizeof(Instruction);
+  core.rip += sizeof(Instruction);
 }
 
 // call instruction implementation
 static void call_handler(uint64_t src, uint64_t dst) {
-  reg.rsp -= 0x8;
-  dram_write(va2pa(reg.rsp), reg.rip + sizeof(Instruction));
-  reg.rip = src;
+  core.reg.rsp -= 0x8;
+  dram_write(va2pa(core.reg.rsp), core.rip + sizeof(Instruction));
+  core.rip = src;
 }
 
 // ret instruction implementation
 static void ret_handler(uint64_t src, uint64_t dst) {
-  reg.rip = dram_read(va2pa(reg.rsp));
-  reg.rsp += 0x8;
+  core.rip = dram_read(va2pa(core.reg.rsp));
+  core.reg.rsp += 0x8;
 }
 
 // call instruction implementation
 static void push_handler(uint64_t src, uint64_t dst) {
-  reg.rsp -= 0x8;
-  dram_write(va2pa(reg.rsp), *(uint64_t *)src);
-  reg.rip += sizeof(Instruction);
+  core.reg.rsp -= 0x8;
+  dram_write(va2pa(core.reg.rsp), *(uint64_t *)src);
+  core.rip += sizeof(Instruction);
 }
 
 // ret instruction implementation
 static void pop_handler(uint64_t src, uint64_t dst) {
-  *(uint64_t *)src = dram_read(va2pa(reg.rsp));
-  reg.rsp += 0x8;
-  reg.rip += sizeof(Instruction);
+  *(uint64_t *)src = dram_read(va2pa(core.reg.rsp));
+  core.reg.rsp += 0x8;
+  core.rip += sizeof(Instruction);
 }

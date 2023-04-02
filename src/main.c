@@ -32,15 +32,15 @@ int main() {
 }
 
 void init_reg() {
-  reg.rax = 0x800114e;
-  reg.rbx = 0x8001190;
-  reg.rcx = 0x8001190;
-  reg.rdx = 0x7ffffffee388;
-  reg.rsi = 0x7ffffffee378;
-  reg.rdi = 0x1;
-  reg.rbp = 0x7ffffffee280;
-  reg.rsp = 0x7ffffffee260;
-  reg.rip = (uint64_t)&program[11];
+  core.reg.rax = 0x800114e;
+  core.reg.rbx = 0x8001190;
+  core.reg.rcx = 0x8001190;
+  core.reg.rdx = 0x7ffffffee388;
+  core.reg.rsi = 0x7ffffffee378;
+  core.reg.rdi = 0x1;
+  core.reg.rbp = 0x7ffffffee280;
+  core.reg.rsp = 0x7ffffffee260;
+  core.rip = (uint64_t)&program[11];
 }
 
 void init_mem() {
@@ -52,24 +52,24 @@ void init_mem() {
 }
 
 void print_reg() {
-  printf("rax          0x%lx\n", reg.rax);
-  printf("rbx          0x%lx\n", reg.rbx);
-  printf("rcx          0x%lx\n", reg.rcx);
-  printf("rdx          0x%lx\n", reg.rdx);
-  printf("rsi          0x%lx\n", reg.rsi);
-  printf("rdi          0x%lx\n", reg.rdi);
-  printf("rbp          0x%lx\n", reg.rbp);
-  printf("rsp          0x%lx\n", reg.rsp);
-  printf("rip          0x%lx\n", reg.rip);
+  printf("rax          0x%lx\n", core.reg.rax);
+  printf("rbx          0x%lx\n", core.reg.rbx);
+  printf("rcx          0x%lx\n", core.reg.rcx);
+  printf("rdx          0x%lx\n", core.reg.rdx);
+  printf("rsi          0x%lx\n", core.reg.rsi);
+  printf("rdi          0x%lx\n", core.reg.rdi);
+  printf("rbp          0x%lx\n", core.reg.rbp);
+  printf("rsp          0x%lx\n", core.reg.rsp);
+  printf("rip          0x%lx\n", core.rip);
 }
 
 void print_mem() {
   int n = 5;
-  uint64_t start = reg.rsp + n * 8;
+  uint64_t start = core.reg.rsp + n * 8;
   for (int i = 0; i < 2 * n; ++i) {
     uint64_t addr = start - i * 8;
     printf("0x%016lx : %16lx", addr, dram_read(va2pa(addr)));
-    if (addr == reg.rsp) {
+    if (addr == core.reg.rsp) {
       printf("  <== rsp");
     }
     printf("\n");

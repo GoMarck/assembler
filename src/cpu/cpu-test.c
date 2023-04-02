@@ -3,7 +3,7 @@
 #include "test/test.h"
 
 TEST_BEGIN(test_gp_register_bit) {
-  Core *cr = &core;
+  core_t *cr = &core;
   cr->reg.rax = 0x7766554433221100;
   EXPECT_U64_EQ(cr->reg.rax, 0x7766554433221100);
   EXPECT_U64_EQ(cr->reg.eax, 0x33221100);

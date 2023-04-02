@@ -37,10 +37,11 @@
 // |%r13                         |%r13d           |%r13w   |%r13b   | --> Callee saved
 // |%r14                         |%r14d           |%r14w   |%r14b   | --> Callee saved
 // |%r15                         |%r15d           |%r15w   |%r15b   | --> Callee saved
-typedef struct register_t {
+typedef struct reg_t {
   REG_DEFINE(rax, eax,  ax,   al);
   REG_DEFINE(rbx, ebx,  bx,   bl);
   REG_DEFINE(rcx, ecx,  cx,   cl);
+  REG_DEFINE(rdx, edx,  dx,   dl);
   REG_DEFINE(rsi, esi,  si,   sil);
   REG_DEFINE(rdi, edi,  di,   dil);
   REG_DEFINE(rbp, ebp,  bp,   bpl);
@@ -53,7 +54,7 @@ typedef struct register_t {
   REG_DEFINE(r13, r13d, r13w, r13b);
   REG_DEFINE(r14, r14d, r14w, r14b);
   REG_DEFINE(r15, r15d, r15w, r15b);
-} register_t;
+} reg_t;
 
 #define BOOL(flag) (bool)(flag)
 #define BYTE(flag) (uint8_t)(flag)
@@ -92,7 +93,7 @@ typedef struct register_t {
 #define OF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x100))
 
 typedef struct core_t {
-  register_t reg;    // a set of 16 general-purpose registers
+  reg_t reg;    // a set of 16 general-purpose registers
   uint64_t rip;    // save current instruction address register
   uint8_t  codes;  // condition codes
 } core_t;
