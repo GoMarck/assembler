@@ -6,6 +6,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define REG_DEFINE(r1, r2, r3, r4) \
+  union {                          \
+    uint64_t (r1);                 \
+    uint32_t (r2);                 \
+    uint16_t (r3);                 \
+    uint8_t  (r4);                 \
+  }
+
 // X86-64 CPU register struct. 
 //
 // It contains a set of 16 general-purpose registers storing 64-bit values. 
@@ -29,113 +37,23 @@
 // |%r13                         |%r13d           |%r13w   |%r13b   | --> Callee saved
 // |%r14                         |%r14d           |%r14w   |%r14b   | --> Callee saved
 // |%r15                         |%r15d           |%r15w   |%r15b   | --> Callee saved
-
-typedef struct Register {
-  union {
-    uint64_t rax;
-    uint32_t eax;
-    uint16_t ax;
-    uint8_t  al;
-  };
-
-  union {
-    uint64_t rbx;
-    uint32_t ebx;
-    uint16_t bx;
-    uint8_t  bl;
-  };
-
-  union {
-    uint64_t rcx;
-    uint32_t ecx;
-    uint16_t cx;
-    uint8_t  cl;
-  };
-
-  union {
-    uint64_t rsi;
-    uint32_t esi;
-    uint16_t si;
-    uint8_t  sil;
-  };
-
-  union {
-    uint64_t rdi;
-    uint32_t edi;
-    uint16_t di;
-    uint8_t  dil;
-  };
-
-  union {
-    uint64_t rbp;
-    uint32_t ebp;
-    uint16_t bp;
-    uint8_t  bpl;
-  };
-
-  union {
-    uint64_t rsp;
-    uint32_t esp;
-    uint16_t sp;
-    uint8_t  spl;
-  };
-
-  union {
-    uint64_t r8;
-    uint32_t r8d;
-    uint16_t r8w;
-    uint8_t  r8b;
-  };
-
-  union {
-    uint64_t r9;
-    uint32_t r9d;
-    uint16_t r9w;
-    uint8_t  r9b;
-  };
-
-  union {
-    uint64_t r10;
-    uint32_t r10d;
-    uint16_t r10w;
-    uint8_t  r10b;
-  };
-
-  union {
-    uint64_t r11;
-    uint32_t r11d;
-    uint16_t r11w;
-    uint8_t  r11b;
-  };
-
-  union {
-    uint64_t r12;
-    uint32_t r12d;
-    uint16_t r12w;
-    uint8_t  r12b;
-  };
-
-  union {
-    uint64_t r13;
-    uint32_t r13d;
-    uint16_t r13w;
-    uint8_t  r13b;
-  };
-
-  union {
-    uint64_t r14;
-    uint32_t r14d;
-    uint16_t r14w;
-    uint8_t  r14b;
-  };
-
-  union {
-    uint64_t r15;
-    uint32_t r15d;
-    uint16_t r15w;
-    uint8_t  r15b;
-  };
-} Register;
+typedef struct register_t {
+  REG_DEFINE(rax, eax,  ax,   al);
+  REG_DEFINE(rbx, ebx,  bx,   bl);
+  REG_DEFINE(rcx, ecx,  cx,   cl);
+  REG_DEFINE(rsi, esi,  si,   sil);
+  REG_DEFINE(rdi, edi,  di,   dil);
+  REG_DEFINE(rbp, ebp,  bp,   bpl);
+  REG_DEFINE(rsp, esp,  sp,   spl);
+  REG_DEFINE(r8,  r8d,  r8w,  r8b);
+  REG_DEFINE(r9,  r9d,  r9w,  r9b);
+  REG_DEFINE(r10, r1d,  r1w,  r1b);
+  REG_DEFINE(r11, r11d, r11w, r11b);
+  REG_DEFINE(r12, r12d, r12w, r12b);
+  REG_DEFINE(r13, r13d, r13w, r13b);
+  REG_DEFINE(r14, r14d, r14w, r14b);
+  REG_DEFINE(r15, r15d, r15w, r15b);
+} register_t;
 
 #define BOOL(flag) (bool)(flag)
 #define BYTE(flag) (uint8_t)(flag)
@@ -164,7 +82,6 @@ typedef struct Register {
 //    * ZF   (t == 0)                               Zero
 //    * SF   (t < 0)                                Negative
 //    * OF   (a < 0 == b < 0) && (t < 0 != a < 0)   Signed overflow
-
 #define CF_RD(cp) BOOL((cp)->codes & 0x1)
 #define CF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)))
 #define ZF_RD(cp) BOOL((cp)->codes & 0x10)
@@ -174,12 +91,12 @@ typedef struct Register {
 #define OF_RD(cp) BOOL((cp)->codes & 0x1000)
 #define OF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x100))
 
-typedef struct Core {
-  Register reg;    // a set of 16 general-purpose registers
+typedef struct core_t {
+  register_t reg;    // a set of 16 general-purpose registers
   uint64_t rip;    // save current instruction address register
   uint8_t  codes;  // condition codes
-} Core;
+} core_t;
 
-Core core;
+core_t core;
 
 #endif  // ASSEMBLER_CPU_H
