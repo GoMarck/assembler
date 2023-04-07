@@ -213,7 +213,7 @@ void parse_operand(const char *str, operand_t *operand) {
     char reg_i[64];
     uint32_t reg_i_len = 0;
     char scal[64];
-    uint32_t scal_len = 64;
+    uint32_t scal_len = 0;
 
     uint8_t bracket_cnt = 0;
     uint8_t comma_cnt = 0;
@@ -235,32 +235,34 @@ void parse_operand(const char *str, operand_t *operand) {
       } else if (bracket_cnt == 1 && comma_cnt == 2) {
         scal[scal_len++] = str[i];
       } else if (bracket_cnt == 2 && comma_cnt == 2) {
-        if (imm_len > 0) {
-          imm[imm_len] = '\0';
-          operand->imm = str2uint64(imm);
-        } 
-
-        if (reg_b_len > 0) {
-          reg_b[reg_b_len] = '\0';
-          operand->reg_b = reflect_register(reg_b, &core);
-        }
-        
-        if (reg_i_len > 0) {
-          reg_i[reg_i_len] = '\0';
-          operand->reg_i = reflect_register(reg_i, &core);
-        }
-        
-        if (scal_len > 0) {
-          scal[scal_len] = '\0';
-          operand->scal = str2uint64(scal);
-          if (operand->scal != (int64_t)1 && operand->scal != (int64_t)2 &&
-              operand->scal != (int64_t)4 && operand->scal != (int64_t)8) {
-            printf("error scal in %s, scal %ld\n", str, operand->scal);
-            abort();
-          }
-        }
+        break;
       } else {
         printf("parse operand error happen: %s\n", str);
+        abort();
+      }
+    }
+
+    if (imm_len > 0) {
+      imm[imm_len] = '\0';
+      operand->imm = str2uint64(imm);
+    }
+
+    if (reg_b_len > 0) {
+      reg_b[reg_b_len] = '\0';
+      operand->reg_b = reflect_register(reg_b, &core);
+    }
+
+    if (reg_i_len > 0) {
+      reg_i[reg_i_len] = '\0';
+      operand->reg_i = reflect_register(reg_i, &core);
+    }
+
+    if (scal_len > 0) {
+      scal[scal_len] = '\0';
+      operand->scal = str2uint64(scal);
+      if (operand->scal != (int64_t)1 && operand->scal != (int64_t)2 &&
+          operand->scal != (int64_t)4 && operand->scal != (int64_t)8) {
+        printf("error scal in %s, scal %ld\n", str, operand->scal);
         abort();
       }
     }

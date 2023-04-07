@@ -103,7 +103,7 @@ TEST_BEGIN(test_parse_operand_register) {
 TEST_END
 
 TEST_BEGIN(test_parse_memory_operand_type) {
-  size_t mem_size = 3;
+  size_t mem_size = 43;
 
   char *mem_operand_list[] = {
       "0x1234",
