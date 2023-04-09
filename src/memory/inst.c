@@ -65,7 +65,7 @@ void add_handler(operand_t *src, operand_t *dst) {
 
 void call_handler(operand_t *src, operand_t *dst) {
   core.reg.rsp -= 0x8;
-  dram_write(va2pa(core.reg.rsp), core.rip + sizeof(inst_t));
+  dram_write(va2pa(core.reg.rsp), core.rip + INSTRUCTION_SIZE);
   RIP_SET(&core, get_operand_val(src));
 }
 

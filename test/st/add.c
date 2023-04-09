@@ -26,13 +26,13 @@ char assembly_code[20][INSTRUCTION_SIZE] = {
   "mov    -0x18(%rbp),%rax",
   "mov    %rdx,%rsi",
   "mov    %rax,%rdi",
-  "callq  0x00400000",
+  "callq  $0x00400000",
   "mov    %rax,-0x8(%rbp)",
   "mov    $0x0,%eax"
 };
 
 void init_assembly_code() {
-  uint64_t code_mem_addr = 0x004002c0;
+  uint64_t code_mem_addr = 0x00400000;
   for (size_t i = 0; i < 18; ++i) {
     dram_write_instruction(va2pa(code_mem_addr), assembly_code[i], INSTRUCTION_SIZE);
     code_mem_addr += INSTRUCTION_SIZE;
@@ -48,7 +48,7 @@ void init_register() {
   core.reg.rdi = 0x1;
   core.reg.rbp = 0x7ffffffee280;
   core.reg.rsp = 0x7ffffffee260;
-  core.rip = 0x00400000;
+  core.rip = 0x004002c0;
 }
 
 void init_memory() {
