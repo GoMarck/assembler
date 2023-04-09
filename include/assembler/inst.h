@@ -8,6 +8,7 @@
 #include "assembler/cpu.h"
 
 #define OP_SIZE 6
+#define INSTRUCTION_SIZE 64
 
 typedef enum OperandType { NUL, IMM, REG, MEM } OperandType;
 

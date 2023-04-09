@@ -19,3 +19,17 @@ void dram_write(uint64_t addr, uint64_t data) {
   }
   memcpy(mem + addr, &data, sizeof(data));
 }
+
+void dram_write_instruction(uint64_t addr, const char *str, size_t size) {
+  if (SRAM_CACHE) {
+    return;
+  }
+  memcpy(mem + addr, str, size);
+}
+
+void dram_read_instruction(uint64_t addr, const char *str, size_t size) {
+  if (SRAM_CACHE) {
+    return;
+  }
+  memcpy((void *)str, mem + addr, size);
+}

@@ -5,8 +5,6 @@
 #include "assembler/dram.h"
 #include "assembler/inst.h"
 
-extern inst_t program[20];
-
 #define MAX_INSTRUCTION_SIZE 128
 
 char assembly[18][MAX_INSTRUCTION_SIZE] = {

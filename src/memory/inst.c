@@ -9,6 +9,9 @@
 #include "assembler/dram.h"
 #include "assembler/mmu.h"
 
+#define RIP_UPDATE(cr) ((cr)->rip += INSTRUCTION_SIZE)
+#define RIP_SET(cr, val) ((cr)->rip = (val))
+
 static uint64_t get_mem_addr(operand_t *od) {
   if (od->type != MEM) {
     printf("error occur when get operand memory address, type: %d\n", od->type);
@@ -42,45 +45,45 @@ static uint64_t get_operand_val(operand_t *od) {
 static void set_operand_val(operand_t *od, uint64_t val) {
   if (od->type == REG) {
     *od->reg_b = val;
-  } else if (od->type == IMM) {
+  } else if (od->type == MEM) {
     dram_write(va2pa(get_mem_addr(od)), val);
   } else {
-    printf("error occur when set operand value, type: %d", od->type);
+    printf("error occur when set operand value, type: %d\n", od->type);
     abort();
   }
 }
 
 void mov_hander(operand_t *src, operand_t *dst) {
   set_operand_val(dst, get_operand_val(src));
-  core.rip += sizeof(inst_t);
+  RIP_UPDATE(&core);
 }
 
 void add_handler(operand_t *src, operand_t *dst) {
   set_operand_val(dst, get_operand_val(src) + get_operand_val(dst));
-  core.rip += sizeof(inst_t);
+  RIP_UPDATE(&core);
 }
 
 void call_handler(operand_t *src, operand_t *dst) {
   core.reg.rsp -= 0x8;
   dram_write(va2pa(core.reg.rsp), core.rip + sizeof(inst_t));
-  core.rip = get_operand_val(src);
+  RIP_SET(&core, get_operand_val(src));
 }
 
 void ret_handler(operand_t *src, operand_t *dst) {
-  core.rip = dram_read(va2pa(core.reg.rsp));
+  RIP_SET(&core, dram_read(va2pa(core.reg.rsp)));
   core.reg.rsp += 0x8;
 }
 
 void push_handler(operand_t *src, operand_t *dst) {
   core.reg.rsp -= 0x8;
   dram_write(va2pa(core.reg.rsp), get_operand_val(src));
-  core.rip += sizeof(inst_t);
+  RIP_UPDATE(&core);
 }
 
 void pop_handler(operand_t *src, operand_t *dst) {
   set_operand_val(dst, dram_read(va2pa(core.reg.rsp)));
   core.reg.rsp += 0x8;
-  core.rip += sizeof(inst_t);
+  RIP_UPDATE(&core);
 }
 
 // init instruction handler table.
@@ -94,10 +97,13 @@ void init_handler_table() {
 }
 
 void parse_instruction() {
-  inst_t *inst = (inst_t *)core.rip;
-  handler_t handler = handler_table[inst->op];
-  handler(&inst->src, &inst->dst);
-  printf("%s\n", inst->code);
+  char inst_str[INSTRUCTION_SIZE];
+  dram_read_instruction(va2pa(core.rip), inst_str, INSTRUCTION_SIZE);
+  inst_t inst;
+  parse_instruction_str(inst_str, &core, &inst);
+  handler_t handler = handler_table[inst.op];
+  handler(&inst.src, &inst.dst);
+  printf("%s\n", inst.code);
 }
 
 void parse_instruction_str(const char *str, core_t *cr, inst_t *inst) {
@@ -161,6 +167,7 @@ void parse_instruction_str(const char *str, core_t *cr, inst_t *inst) {
   parse_operation(op, &inst->op);
   parse_operand(src, cr, &inst->src);
   parse_operand(dst, cr, &inst->dst);
+  inst->code = str;
 }
 
 void parse_operation(const char *str, op_t *op) {
@@ -177,7 +184,7 @@ void parse_operation(const char *str, op_t *op) {
   } else if (strcmp(str, "pop") == 0 || strcmp(str, "popq") == 0) {
     *op = POP;
   } else {
-    printf("error op: %s", str);
+    printf("error op: %s\n", str);
     abort();
   }
 }
