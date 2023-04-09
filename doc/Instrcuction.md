@@ -16,7 +16,7 @@ typedef struct operand_t {
 } operand_t;
 
 // define opeartion. e.g. MOV, CALL...
-typedef enum Operation {
+typedef enum op_t {
   MOV_IMM_REG,
   MOV_MEM_REG,
   MOV_REG_REG,
@@ -27,13 +27,13 @@ typedef enum Operation {
   RET,
   PUSH,
   POP
-} Operation;
+} op_t;
 
 // define instruction. e.g. mov %rdx, %rdi
 typedef struct inst_t {
   operand_t src;
   operand_t dst;
-  Operation op;
+  op_t op;
   const char *code;
 } inst_t;
 ```

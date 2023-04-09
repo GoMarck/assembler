@@ -34,7 +34,7 @@ TEST_BEGIN(test_parse_operand_immediate_number) {
 
   for (size_t i = 0; i < imm_size; ++i) {
     operand_t op;
-    parse_operand(imm_operand_list[i], &op);
+    parse_operand(imm_operand_list[i], &core, &op);
     EXPECT_U32_EQ(op.type, IMM);
     EXPECT_U64_EQ(op.imm, cmp_list[i]);
   }
@@ -94,7 +94,7 @@ TEST_BEGIN(test_parse_operand_register) {
 
   for (size_t i = 0; i < reg_size; ++i) {
     operand_t op;
-    parse_operand(reg_operand_list[i], &op);
+    parse_operand(reg_operand_list[i], &core, &op);
     EXPECT_U32_EQ(op.type, REG);
     EXPECT_PTR_EQ(op.reg_b, cmp_reg_addr_list[i]);
     EXPECT_PTR_EQ(op.reg_i, NULL);
@@ -199,7 +199,7 @@ TEST_BEGIN(test_parse_memory_operand_type) {
 
   for (size_t i = 0; i < mem_size; ++i) {
     operand_t op;
-    parse_operand(mem_operand_list[i], &op);
+    parse_operand(mem_operand_list[i], &core, &op);
     EXPECT_U32_EQ(op.type, MEM);
     EXPECT_PTR_EQ(op.reg_b, cmp_op_list[i].reg_b);
     EXPECT_PTR_EQ(op.reg_i, cmp_op_list[i].reg_i);

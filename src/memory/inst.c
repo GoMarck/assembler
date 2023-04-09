@@ -17,41 +17,37 @@ typedef void (*handler_t)(uint64_t, uint64_t);
 handler_t handler_table[OP_SIZE];
 
 static void mov_imm_reg_handler(uint64_t src, uint64_t dst);
-static void mov_mem_reg_handler(uint64_t src, uint64_t dst);
-static void mov_reg_reg_handler(uint64_t src, uint64_t dst);
-static void mov_imm_mem_handler(uint64_t src, uint64_t dst);
-static void mov_reg_mem_handler(uint64_t src, uint64_t dst);
+// static void mov_mem_reg_handler(uint64_t src, uint64_t dst);
+// static void mov_reg_reg_handler(uint64_t src, uint64_t dst);
+// static void mov_imm_mem_handler(uint64_t src, uint64_t dst);
+// static void mov_reg_mem_handler(uint64_t src, uint64_t dst);
 static void add_reg_reg_handler(uint64_t src, uint64_t dst);
 static void call_handler(uint64_t src, uint64_t dst);
 static void ret_handler(uint64_t src, uint64_t dst);
 static void push_handler(uint64_t src, uint64_t dst);
 static void pop_handler(uint64_t src, uint64_t dst);
-static uint64_t decode_od(operand_t *od);
+static uint64_t decode_operand(operand_t *od);
 
 // init instruction handler table.
 void init_handler_table() {
-  handler_table[MOV_IMM_REG] = &mov_imm_reg_handler;
-  handler_table[MOV_MEM_REG] = &mov_mem_reg_handler;
-  handler_table[MOV_REG_REG] = &mov_reg_reg_handler;
-  handler_table[MOV_IMM_MEM] = &mov_imm_mem_handler;
-  handler_table[MOV_REG_MEM] = &mov_reg_mem_handler;
-  handler_table[ADD_REG_REG] = &add_reg_reg_handler;
+  handler_table[MOV] = &mov_imm_reg_handler;
+  handler_table[ADD] = &add_reg_reg_handler;
   handler_table[CALL] = &call_handler;
   handler_table[RET] = &ret_handler;
   handler_table[PUSH] = &push_handler;
   handler_table[POP] = &pop_handler;
 }
 
-void parse_inst() {
+void parse_instruction() {
   inst_t *inst = (inst_t *)core.rip;
-  uint64_t src = decode_od(&inst->src);
-  uint64_t dst = decode_od(&inst->dst);
+  uint64_t src = decode_operand(&inst->src);
+  uint64_t dst = decode_operand(&inst->dst);
   handler_t handler = handler_table[inst->op];
   handler(src, dst);
   printf("%s\n", inst->code);
 }
 
-static uint64_t decode_od(operand_t *od) {
+static uint64_t decode_operand(operand_t *od) {
   uint64_t val = 0;
   if (od->type == IMM) {
     val = od->imm;
@@ -75,29 +71,29 @@ static void mov_imm_reg_handler(uint64_t src, uint64_t dst) {
   core.rip += sizeof(inst_t);
 }
 
-// mov instruction implementation
-static void mov_mem_reg_handler(uint64_t src, uint64_t dst) {
-  *(uint64_t *)dst = dram_read(va2pa(src));
-  core.rip += sizeof(inst_t);
-}
+// // mov instruction implementation
+// static void mov_mem_reg_handler(uint64_t src, uint64_t dst) {
+//   *(uint64_t *)dst = dram_read(va2pa(src));
+//   core.rip += sizeof(inst_t);
+// }
 
-// mov instruction implementation
-static void mov_reg_reg_handler(uint64_t src, uint64_t dst) {
-  *(uint64_t *)dst = *(uint64_t *)src;
-  core.rip += sizeof(inst_t);
-}
+// // mov instruction implementation
+// static void mov_reg_reg_handler(uint64_t src, uint64_t dst) {
+//   *(uint64_t *)dst = *(uint64_t *)src;
+//   core.rip += sizeof(inst_t);
+// }
 
-// mov instruction implementation
-static void mov_imm_mem_handler(uint64_t src, uint64_t dst) {
-  dram_write(va2pa(dst), src);
-  core.rip += sizeof(inst_t);
-}
+// // mov instruction implementation
+// static void mov_imm_mem_handler(uint64_t src, uint64_t dst) {
+//   dram_write(va2pa(dst), src);
+//   core.rip += sizeof(inst_t);
+// }
 
-// mov instruction implementation
-static void mov_reg_mem_handler(uint64_t src, uint64_t dst) {
-  dram_write(va2pa(dst), *(uint64_t *)src);
-  core.rip += sizeof(inst_t);
-}
+// // mov instruction implementation
+// static void mov_reg_mem_handler(uint64_t src, uint64_t dst) {
+//   dram_write(va2pa(dst), *(uint64_t *)src);
+//   core.rip += sizeof(inst_t);
+// }
 
 // add instruction implementation
 static void add_reg_reg_handler(uint64_t src, uint64_t dst) {
@@ -132,8 +128,86 @@ static void pop_handler(uint64_t src, uint64_t dst) {
   core.rip += sizeof(inst_t);
 }
 
-void parse_instruction_str(const char *str, inst_t *inst) {
+void parse_instruction_str(const char *str, core_t *cr, inst_t *inst) {
+  char op[64];
+  uint32_t op_len = 0;
+  char src[64];
+  uint32_t src_len = 0;
+  char dst[64];
+  uint32_t dst_len = 0;
 
+  uint8_t bracket_cnt = 0;
+  uint32_t state = 0;
+  size_t size = strlen(str);
+
+  for (size_t i = 0; i < size; ++i) {
+    char c = str[i];
+    if (c == '(' || c == ')') {
+      ++bracket_cnt;
+    }
+
+    if (state == 0) {
+      if (c == ' ') {
+        continue;
+      }
+      state = 1;
+      op[op_len++] = c;
+    } else if (state == 1) {
+      if (c == ' ') {
+        state = 2;
+        continue;
+      } else {
+        op[op_len++] = c;
+      }
+    } else if (state == 2) {
+      if (c == ' ') {
+        continue;
+      } else {
+        state = 3;
+        src[src_len++] = c;
+      }
+    } else if (state == 3) {
+      if (c == ',' && (bracket_cnt == 0 || bracket_cnt == 2)) {
+        state = 4;
+      } else {
+        src[src_len++] = c;
+      }
+    } else if (state == 4) {
+      if (c != ' ') {
+        state = 5;
+        dst[dst_len++] = c;
+      }
+    } else if (state == 5) {
+      dst[dst_len++] = c;
+    }
+  }
+
+  op[op_len] = '\0';
+  src[src_len] = '\0';
+  dst[dst_len] = '\0';
+
+  parse_operation(op, &inst->op);
+  parse_operand(src, cr, &inst->src);
+  parse_operand(dst, cr, &inst->dst);
+}
+
+void parse_operation(const char *str, op_t *op) {
+  if (strcmp(str, "mov") == 0 || strcmp(str, "movq") == 0) {
+    *op = MOV;
+  } else if (strcmp(str, "add") == 0 || strcmp(str, "addq") == 0) {
+    *op = ADD;
+  } else if (strcmp(str, "call") == 0 || strcmp(str, "callq") == 0) {
+    *op = CALL;
+  } else if (strcmp(str, "ret") == 0 || strcmp(str, "retq") == 0) {
+    *op = RET;
+  } else if (strcmp(str, "push") == 0 || strcmp(str, "pushq") == 0) {
+    *op = PUSH;
+  } else if (strcmp(str, "pop") == 0 || strcmp(str, "popq") == 0) {
+    *op = POP;
+  } else {
+    printf("error op: %s", str);
+    abort();
+  }
 }
 
 // TODO: very low performance, need optimize.
@@ -184,7 +258,7 @@ static uint64_t *reflect_register(const char *str, core_t *cr) {
   abort();
 }
 
-void parse_operand(const char *str, operand_t *operand) {
+void parse_operand(const char *str, core_t *cr, operand_t *operand) {
   // init
   operand->imm = 0;
   operand->reg_b = NULL;
@@ -194,8 +268,7 @@ void parse_operand(const char *str, operand_t *operand) {
 
   size_t size = strlen(str);
   if (size == 0) {
-    printf("operand is empty");
-    abort();
+    return;
   }
 
   if (str[0] == '$') {
@@ -203,7 +276,7 @@ void parse_operand(const char *str, operand_t *operand) {
     operand->imm = str2uint64_range(str, 1, size);
   } else if (str[0] == '%') {
     operand->type = REG;
-    operand->reg_b = reflect_register(str, &core);
+    operand->reg_b = reflect_register(str, cr);
   } else {
     operand->type = MEM;
     char imm[64];
@@ -249,12 +322,12 @@ void parse_operand(const char *str, operand_t *operand) {
 
     if (reg_b_len > 0) {
       reg_b[reg_b_len] = '\0';
-      operand->reg_b = reflect_register(reg_b, &core);
+      operand->reg_b = reflect_register(reg_b, cr);
     }
 
     if (reg_i_len > 0) {
       reg_i[reg_i_len] = '\0';
-      operand->reg_i = reflect_register(reg_i, &core);
+      operand->reg_i = reflect_register(reg_i, cr);
     }
 
     if (scal_len > 0) {

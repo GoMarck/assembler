@@ -47,7 +47,7 @@ int main() {
   init_reg();
   init_mem();
   for (int i = 0; i < 20; ++i) {
-    parse_inst();
+    parse_instruction();
     print_reg();
     print_mem();
   }
@@ -63,7 +63,7 @@ void init_reg() {
   core.reg.rdi = 0x1;
   core.reg.rbp = 0x7ffffffee280;
   core.reg.rsp = 0x7ffffffee260;
-  core.rip = (uint64_t)&program[11];
+  core.rip = (uint64_t)0;
 }
 
 void init_mem() {

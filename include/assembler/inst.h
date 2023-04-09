@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#include "assembler/cpu.h"
+
 typedef enum OperandType { NUL, IMM, REG, MEM } OperandType;
 
 // define operand.
@@ -17,24 +19,20 @@ typedef struct operand_t {
 } operand_t;
 
 // define opeartion. e.g. MOV, CALL...
-typedef enum Operation {
-  MOV_IMM_REG,
-  MOV_MEM_REG,
-  MOV_REG_REG,
-  MOV_IMM_MEM,
-  MOV_REG_MEM,
-  ADD_REG_REG,
+typedef enum op_t {
+  MOV,
+  ADD,
   CALL,
   RET,
   PUSH,
   POP
-} Operation;
+} op_t;
 
 // define instruction. e.g. mov %rdx, %rdi
 typedef struct inst_t {
   operand_t src;
   operand_t dst;
-  Operation op;
+  op_t op;
   const char *code;
 } inst_t;
 
@@ -42,7 +40,7 @@ typedef struct inst_t {
 void init_handler_table();
 
 // parse instruction and effect cpu register and memory.
-void parse_inst();
+void parse_instruction();
 
 // Parse string into instruction set. There are two parts combine to an
 // instruction: operation and operand. The forms of the operation parsed
@@ -67,9 +65,12 @@ void parse_inst();
 // | Memory    | Imm(r_b,r_i,s) | M[Imm+R[r_b]+R[r_i]*s] | Scaled indexed      |
 //
 // @param[in] str The instruction string to be parsed.
+// @param[in] cr The core instruction belongs to.
 // @param[out] inst The parsed instruction is output here.
-void parse_instruction_str(const char *str, inst_t *inst);
+void parse_instruction_str(const char *str, core_t *cr, inst_t *inst);
 
-void parse_operand(const char *str, operand_t *operand);
+void parse_operation(const char *str, op_t *op);
+
+void parse_operand(const char *str, core_t *cr, operand_t *operand);
 
 #endif  // ASSEMBLER_INST_H
