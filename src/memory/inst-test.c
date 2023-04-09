@@ -1,11 +1,12 @@
 #include "assembler/inst.h"
 
+#include <bits/stdint-uintn.h>
 #include <stdio.h>
 
 #include "assembler/cpu.h"
 #include "test/test.h"
 
-TEST_BEGIN(test_parse_operand_immediate_number) {
+TEST_BEGIN(test_parse_immediate_operand_type) {
   size_t imm_size = 14;
 
   char *imm_operand_list[] = {
@@ -41,7 +42,7 @@ TEST_BEGIN(test_parse_operand_immediate_number) {
 }
 TEST_END
 
-TEST_BEGIN(test_parse_operand_register) {
+TEST_BEGIN(test_parse_register_operand_type) {
   size_t reg_size = 64;
 
   char *reg_operand_list[] = {
@@ -209,8 +210,220 @@ TEST_BEGIN(test_parse_memory_operand_type) {
 }
 TEST_END
 
+TEST_BEGIN(test_parse_instruction_str) {
+  uint32_t inst_size = 28;
+
+  char *inst_str_list[] = {
+      "mov  %rax,%rbx",
+      "movq $0x1234,%rcx",
+      "push %rbp",
+      "popq %rbp",
+      "addq %rdi,0xabcd",
+      "add  %rsi,(%rcx)",
+      "add  %rsi,1234(%rsp)",
+      "add  %rsi,(%r8,%r9)",
+      "add  %rsi,0xabcd(%r8,%r9)",
+      "add  %rsi,(%r10,%r11,1)",
+      "add  %rsi,0xabcd(%r12,%r15,4)",
+      "add  %rsi,(,%r13,1)",
+      "add  %rsi,0xabcd(,%r14,4)",
+      "mov  $0x1234abcd,(%rcx)",
+      "mov  $0x1234abcd,1234(%rsp)",
+      "mov  $0x1234abcd,(%r8,%r9)",
+      "mov  $0x1234abcd,0xabcd(%r8,%r9)",
+      "mov  $0x1234abcd,(%r10,%r11,1)",
+      "mov  $0x1234abcd,0xabcd(%r12,%r15,4)",
+      "mov  $0x1234abcd,(,%r13,1)",
+      "mov  $0x1234abcd,0xabcd(,%r14,4)",
+      "movq  (%rcx),%rdi",
+      "movq  1234(%rsp),%rdi",
+      "movq  (%r8,%r9),%rdi",
+      "movq  0xabcd(%r8,%r9),%rdi",
+      "movq  (%r10,%r11,1),%rdi",
+      "movq  0xabcd(%r12,%r15,4),%rdi",
+      "movq  (,%r13,1),%rdi",
+      "movq  0xabcd(,%r14,4),%rdi",
+  };
+
+  // {TYPE, imm, scal, r_b, r_i }
+  inst_t cmp_inst_list[] = {
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rax, NULL}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rbx, NULL}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234, 1, NULL, NULL}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rcx, NULL}, 
+        MOV
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rbp, NULL}, 
+        {NUL, 0, 1, NULL, NULL}, 
+        PUSH
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rbp, NULL}, 
+        {NUL, 0, 1, NULL, NULL}, 
+        POP
+      },
+      // op reg,mem compare
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL}, 
+        {MEM, 0xabcd, 1, NULL, NULL}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 0, 1, (uint64_t *)&core.reg.rcx, NULL}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 1234, 1, (uint64_t *)&core.reg.rsp, NULL}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 0, 1, (uint64_t *)&core.reg.r8, (uint64_t *)&core.reg.r9}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 0xabcd, 1, (uint64_t *)&core.reg.r8, (uint64_t *)&core.reg.r9}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 0, 1, (uint64_t *)&core.reg.r10, (uint64_t *)&core.reg.r11}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 0xabcd, 4, (uint64_t *)&core.reg.r12, (uint64_t *)&core.reg.r15}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 0, 1, NULL, (uint64_t *)&core.reg.r13}, 
+        ADD
+      },
+      {
+        {REG, 0, 1, (uint64_t *)&core.reg.rsi, NULL}, 
+        {MEM, 0xabcd, 4, NULL, (uint64_t *)&core.reg.r14}, 
+        ADD
+      },
+      // op imm,mem compare
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 0, 1, (uint64_t *)&core.reg.rcx, NULL}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 1234, 1, (uint64_t *)&core.reg.rsp, NULL}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 0, 1, (uint64_t *)&core.reg.r8, (uint64_t *)&core.reg.r9}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 0xabcd, 1, (uint64_t *)&core.reg.r8, (uint64_t *)&core.reg.r9}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 0, 1, (uint64_t *)&core.reg.r10, (uint64_t *)&core.reg.r11}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 0xabcd, 4, (uint64_t *)&core.reg.r12, (uint64_t *)&core.reg.r15}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 0, 1, NULL, (uint64_t *)&core.reg.r13}, 
+        MOV
+      },
+      {
+        {IMM, 0x1234abcd, 1, NULL, NULL}, 
+        {MEM, 0xabcd, 4, NULL, (uint64_t *)&core.reg.r14}, 
+        MOV
+      },
+      // op mem,reg
+      {
+        {MEM, 0, 1, (uint64_t *)&core.reg.rcx, NULL}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+      {
+        {MEM, 1234, 1, (uint64_t *)&core.reg.rsp, NULL}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+      {
+        {MEM, 0, 1, (uint64_t *)&core.reg.r8, (uint64_t *)&core.reg.r9}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+      {
+        {MEM, 0xabcd, 1, (uint64_t *)&core.reg.r8, (uint64_t *)&core.reg.r9}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+      {
+        {MEM, 0, 1, (uint64_t *)&core.reg.r10, (uint64_t *)&core.reg.r11}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+      {
+        {MEM, 0xabcd, 4, (uint64_t *)&core.reg.r12, (uint64_t *)&core.reg.r15}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+      {
+        {MEM, 0, 1, NULL, (uint64_t *)&core.reg.r13}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+      {
+        {MEM, 0xabcd, 4, NULL, (uint64_t *)&core.reg.r14}, 
+        {REG, 0, 1, (uint64_t *)&core.reg.rdi, NULL},
+        MOV 
+      },
+  };
+  
+
+  for (size_t i = 0; i < inst_size; ++i) {
+    inst_t inst;
+    parse_instruction_str(inst_str_list[i], &core, &inst);
+    // Compare operation.
+    EXPECT_U64_EQ(inst.op, cmp_inst_list[i].op);
+
+    // Compare source operand.
+    EXPECT_U64_EQ(inst.src.type, cmp_inst_list[i].src.type);
+    EXPECT_D64_EQ(inst.src.imm, cmp_inst_list[i].src.imm);
+    EXPECT_D64_EQ(inst.src.scal, cmp_inst_list[i].src.scal);
+    EXPECT_U64_EQ(inst.src.reg_b, cmp_inst_list[i].src.reg_b);
+    EXPECT_U64_EQ(inst.src.reg_i, cmp_inst_list[i].src.reg_i);
+    
+    // Compare destination operand.
+    EXPECT_U64_EQ(inst.dst.type, cmp_inst_list[i].dst.type);
+    EXPECT_D64_EQ(inst.dst.imm, cmp_inst_list[i].dst.imm);
+    EXPECT_D64_EQ(inst.dst.scal, cmp_inst_list[i].dst.scal);
+    EXPECT_U64_EQ(inst.dst.reg_b, cmp_inst_list[i].dst.reg_b);
+    EXPECT_U64_EQ(inst.dst.reg_i, cmp_inst_list[i].dst.reg_i);
+  }
+}
+TEST_END
+
 int main(void) {
-  return RUN_TESTS(test_parse_operand_immediate_number,
-                   test_parse_operand_register, 
-                   test_parse_memory_operand_type);
+  return RUN_TESTS(test_parse_immediate_operand_type,
+                   test_parse_register_operand_type,
+                   test_parse_memory_operand_type, 
+                   test_parse_instruction_str);
 }

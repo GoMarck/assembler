@@ -249,12 +249,12 @@ static uint64_t *reflect_register(const char *str, core_t *cr) {
     (uint64_t *)&cr->reg.r14, (uint64_t *)&cr->reg.r14d, (uint64_t *)&cr->reg.r14w, (uint64_t *)&cr->reg.r14b,
     (uint64_t *)&cr->reg.r15, (uint64_t *)&cr->reg.r15d, (uint64_t *)&cr->reg.r15w, (uint64_t *)&cr->reg.r15b
   };
-  for (size_t i = 0; i < sizeof(reg_name_table); ++i) {
+  for (size_t i = 0; i < 64; ++i) {
     if (strcmp(str, reg_name_table[i]) == 0) {
       return reg_addr_table[i];
     }
   }
-  printf("parse register failed: %s\n", str);
+  printf("parse register failed: \"%s\"\n", str);
   abort();
 }
 
