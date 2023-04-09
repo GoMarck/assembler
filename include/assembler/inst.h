@@ -7,6 +7,8 @@
 
 #include "assembler/cpu.h"
 
+#define OP_SIZE 6
+
 typedef enum OperandType { NUL, IMM, REG, MEM } OperandType;
 
 // define operand.
@@ -36,10 +38,13 @@ typedef struct inst_t {
   const char *code;
 } inst_t;
 
+typedef void (*handler_t)(operand_t *, operand_t *);
+handler_t handler_table[OP_SIZE];
+
 // init instruction handler table.
 void init_handler_table();
 
-// parse instruction and effect cpu register and memory.
+// Parse instruction and effect cpu register and memory.
 void parse_instruction();
 
 // Parse string into instruction set. There are two parts combine to an
@@ -72,5 +77,13 @@ void parse_instruction_str(const char *str, core_t *cr, inst_t *inst);
 void parse_operation(const char *str, op_t *op);
 
 void parse_operand(const char *str, core_t *cr, operand_t *operand);
+
+// private zone, just for test purpose
+void mov_hander(operand_t *src, operand_t *dst);
+void add_handler(operand_t *src, operand_t *dst);
+void call_handler(operand_t *src, operand_t *dst);
+void ret_handler(operand_t *src, operand_t *dst);
+void push_handler(operand_t *src, operand_t *dst);
+void pop_handler(operand_t *src, operand_t *dst);
 
 #endif  // ASSEMBLER_INST_H
