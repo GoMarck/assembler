@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MEM_SIZE 1024 * 1024
+#define MEM_SIZE (1 << 20)
 
 uint8_t mem[MEM_SIZE];
 

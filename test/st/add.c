@@ -6,7 +6,9 @@
 #include "assembler/mmu.h"
 #include "test/test.h"
 
-char assembly_code[20][INSTRUCTION_SIZE] = {
+#define CODE_SIZE 20
+
+char assembly_code[CODE_SIZE][INSTRUCTION_SIZE] = {
   // add
   "push   %rbp",
   "mov    %rsp,%rbp",
@@ -33,7 +35,7 @@ char assembly_code[20][INSTRUCTION_SIZE] = {
 
 void init_assembly_code() {
   uint64_t code_mem_addr = 0x00400000;
-  for (size_t i = 0; i < 18; ++i) {
+  for (size_t i = 0; i < CODE_SIZE; ++i) {
     dram_write_instruction(va2pa(code_mem_addr), assembly_code[i], INSTRUCTION_SIZE);
     code_mem_addr += INSTRUCTION_SIZE;
   }
@@ -86,8 +88,7 @@ void print_memory() {
 }
 
 void instruction_cycle() {
-  for (int i = 0; i < 20; ++i) {
-    printf("===========================%d==================================\n", i);
+  for (int i = 0; i < CODE_SIZE; ++i) {
     parse_instruction();
     print_register();
     print_memory();

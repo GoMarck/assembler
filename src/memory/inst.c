@@ -81,7 +81,7 @@ void push_handler(operand_t *src, operand_t *dst) {
 }
 
 void pop_handler(operand_t *src, operand_t *dst) {
-  set_operand_val(dst, dram_read(va2pa(core.reg.rsp)));
+  set_operand_val(src, dram_read(va2pa(core.reg.rsp)));
   core.reg.rsp += 0x8;
   RIP_UPDATE(&core);
 }
