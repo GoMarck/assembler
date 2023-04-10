@@ -33,7 +33,16 @@ TEST_BEGIN(test_example) {
 }
 TEST_END
 
+void test_func() {
+  EXPECT_U64_EQ(1, 1);
+}
+
+TEST_BEGIN(test_example_func) {
+  test_func();
+}
+TEST_END
+
 int main() {
   // run testcases defined in this file.
-  return RUN_TESTS(test_example);
+  return RUN_TESTS(test_example, test_example_func);
 }

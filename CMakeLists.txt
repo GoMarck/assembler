@@ -98,6 +98,8 @@ endfunction ()
 if (WITH_TEST)
   include (CTest)
   enable_testing ()
+  # add example test.
+  ADD_ASSEMBLER_TEST (example-test SRC_FILES test/example/example-test.c)
   # add cpu test.
   ADD_ASSEMBLER_TEST (cpu-test SRC_FILES src/cpu/cpu-test.c)
   # add instruction test.

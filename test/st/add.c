@@ -87,11 +87,55 @@ void print_memory() {
   }
 }
 
+// register compare list
+uint64_t rbp_cmp_list[CODE_SIZE] = {
+  0x7ffffffee280, 0x7ffffffee280, 0x7ffffffee280,
+  0x7ffffffee280, 0x7ffffffee280, 0x7ffffffee280,
+  0x7ffffffee280, 0x7ffffffee280,
+};
+
+uint64_t rax_cmp_list[CODE_SIZE] = {
+  0x800114e,  0x800114e,  0x800114e,  0x08001040,
+  0x08001040, 0x08001040, 0x08001040, 0x08001040,
+  0x08001040, 0x08001040, 0x08001040, 0x08001040,
+};
+
+uint64_t rdx_cmp_list[CODE_SIZE] = {
+  0x7ffffffee388, 0x7ffffffee388, 0x00007ffffffee370,
+  0x00007ffffffee370, 0x00007ffffffee370, 0x00007ffffffee370,
+  0x00007ffffffee370
+};
+
+uint64_t rdi_cmp_list[CODE_SIZE] = {
+  0x1, 0x1, 0x1, 0x1, 0x1, 0x08001040, 0x08001040, 0x08001040
+};
+
+uint64_t rsi_cmp_list[CODE_SIZE] = {
+  0x7ffffffee378, 0x7ffffffee378, 0x7ffffffee378, 
+  0x7ffffffee378, 0x00007ffffffee370, 0x00007ffffffee370,
+  0x00007ffffffee370,
+};
+
+void register_verify(int i) {
+  EXPECT_U64_EQ(core.reg.rbp, rbp_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rax, rax_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rdx, rdx_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rdi, rdi_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rsi, rsi_cmp_list[i]);
+}
+
+void memory_verify(int i) {
+
+}
+
 void instruction_cycle() {
-  for (int i = 0; i < CODE_SIZE; ++i) {
+  for (int i = 0; i < 7; ++i) {
+    printf("===================%d\n", i);
     parse_instruction();
-    print_register();
-    print_memory();
+    register_verify(i);
+    memory_verify(i);
+    // print_register();
+    // print_memory();
   }
 }
 

@@ -2,8 +2,6 @@
 ## What is Assembler
 Assembler is a very simple emulator, just for fun. Its implementation theory is derived from the book CSAPP (CMU 15-213).
 
-The project obey the Google C/C++ style guide
-
 The project is reference from: [yangminz
 /bcst_csapp](https://github.com/yangminz/bcst_csapp). Thanks to [yangminz](https://github.com/yangminz), I learn a lot from the project and his lesson in [bilibili](https://space.bilibili.com/4564101/video). And we obey the [Google C++ style guide](https://google.github.io/styleguide/cppguide.html).
 
@@ -60,8 +58,8 @@ Based on the features we have implemented, we want to implement these features i
 - ~~Find a favorite C style guide and follow it.~~
 - ~~We need a story folder to place some design documents.~~
 - ~~Find a C ut framework to test the codes.~~
-- Refactor the project to make the hierarchy more reasonable.
-- Implement an instruction set string parsing state machine.
+- ~~Refactor the project to make the hierarchy more reasonable.~~
+- ~~Implement an instruction set string parsing state machine.~~
 - Implement SRAM cache function.
 - Implement MMU(Memory Manager Unit) function.
 - Implement the linking function.
