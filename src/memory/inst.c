@@ -32,7 +32,7 @@ static uint64_t get_operand_val(operand_t *od) {
   if (od->type == IMM) {
     val = od->imm;
   } else if (od->type == REG) {
-    val = (uint64_t)od->reg_b;
+    val = *od->reg_b;
   } else if (od->type == MEM) {
     val = dram_read(va2pa(get_mem_addr(od)));
   } else {
