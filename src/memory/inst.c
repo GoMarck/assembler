@@ -8,6 +8,7 @@
 #include "assembler/convert.h"
 #include "assembler/cpu.h"
 #include "assembler/dram.h"
+#include "assembler/log.h"
 #include "assembler/mmu.h"
 
 #define RIP_UPDATE(cr) ((cr)->rip += INSTRUCTION_SIZE)
@@ -15,8 +16,7 @@
 
 static uint64_t get_mem_addr(operand_t *od) {
   if (od->type != MEM) {
-    printf("error occur when get operand memory address, type: %d\n", od->type);
-    abort();
+    LOG(FATAL, "Error occured when get operand memory address, type: %d", od->type);
   }
   uint64_t addr = od->imm;
   if (od->reg_b != NULL) {
@@ -37,8 +37,7 @@ static uint64_t get_operand_val(operand_t *od) {
   } else if (od->type == MEM) {
     val = dram_read(va2pa(get_mem_addr(od)));
   } else {
-    printf("error occur when get operand value, type: %d\n", od->type);
-    abort();
+    LOG(FATAL, "Error occured when get operand value, type: %d\n", od->type);
   }
   return val;
 }
@@ -49,8 +48,7 @@ static void set_operand_val(operand_t *od, uint64_t val) {
   } else if (od->type == MEM) {
     dram_write(va2pa(get_mem_addr(od)), val);
   } else {
-    printf("error occur when set operand value, type: %d\n", od->type);
-    abort();
+    LOG(FATAL, "Error occured when set operand value, type: %d\n", od->type);
   }
 }
 
@@ -167,7 +165,7 @@ void parse_instruction() {
   parse_instruction_str(inst_str, &core, &inst);
   handler_t handler = handler_table[inst.op];
   handler(&inst.src, &inst.dst);
-  printf("%s\n", inst.code);
+  LOG(VERBOSE, "%s", inst.code);
 }
 
 void parse_instruction_str(const char *str, core_t *cr, inst_t *inst) {
@@ -248,8 +246,7 @@ void parse_operation(const char *str, op_t *op) {
   } else if (strcmp(str, "pop") == 0 || strcmp(str, "popq") == 0) {
     *op = POP;
   } else {
-    printf("error op: %s\n", str);
-    abort();
+    LOG(FATAL, "Error operation: [%s]", str);
   }
 }
 
@@ -297,8 +294,7 @@ static uint64_t *reflect_register(const char *str, core_t *cr) {
       return reg_addr_table[i];
     }
   }
-  printf("parse register failed: \"%s\"\n", str);
-  abort();
+  LOG(FATAL, "Parse register string failed: [%s]", str);
 }
 
 void parse_operand(const char *str, core_t *cr, operand_t *operand) {
@@ -353,8 +349,7 @@ void parse_operand(const char *str, core_t *cr, operand_t *operand) {
       } else if (bracket_cnt == 2 && comma_cnt == 2) {
         break;
       } else {
-        printf("parse operand error happen: %s\n", str);
-        abort();
+        LOG(FATAL, "Parse operand string and error happen: [%s]", str);
       }
     }
 
@@ -378,8 +373,7 @@ void parse_operand(const char *str, core_t *cr, operand_t *operand) {
       operand->scal = str2uint64(scal);
       if (operand->scal != (int64_t)1 && operand->scal != (int64_t)2 &&
           operand->scal != (int64_t)4 && operand->scal != (int64_t)8) {
-        printf("error scal in %s, scal %ld\n", str, operand->scal);
-        abort();
+        LOG(FATAL, "Error scal in [%s], scal [%ld]", str, operand->scal);
       }
     }
   }

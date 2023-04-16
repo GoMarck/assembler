@@ -46,7 +46,7 @@ typedef struct inst_t {
 typedef void (*handler_t)(operand_t *, operand_t *);
 handler_t handler_table[OP_SIZE];
 
-// init instruction handler table.
+// Init instruction handler table.
 void init_handler_table();
 
 // Parse instruction and effect cpu register and memory.
@@ -79,11 +79,18 @@ void parse_instruction();
 // @param[out] inst The parsed instruction is output here.
 void parse_instruction_str(const char *str, core_t *cr, inst_t *inst);
 
+// Parse operation string like mov, add, sub and so on, if parse failed, sigabrt raised.
+// @param[in] str Operation string pointer.
+// @param[out] op The parsed result would be stored here.
 void parse_operation(const char *str, op_t *op);
 
+// Parse operand string like %rax, $0x1234, (%rax, %rdi, 4) and so on, if parse failed, sigabrt raised.
+// @param[in] str Operand string pointer.
+// @param[in] cr The cpu core.
+// @param[out] operand The parsed result would be stored here.
 void parse_operand(const char *str, core_t *cr, operand_t *operand);
 
-// private zone, just for test purpose
+// Private zone, just for test purpose.
 void mov_hander(operand_t *src, operand_t *dst);
 void add_handler(operand_t *src, operand_t *dst);
 void call_handler(operand_t *src, operand_t *dst);

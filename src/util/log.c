@@ -28,4 +28,15 @@ void log_to_stderr(char *buf, size_t len, const char *format, ...) {
   va_end(ap);
 }
 
-void log_tail(const char *buf) { fprintf(stderr, "%s", buf); }
+void log_tail(const char *buf) { 
+  fprintf(stderr, "%s", buf); 
+}
+
+const char* const_basename(const char* filepath) {
+  const char* base = strrchr(filepath, '/');
+#ifdef OS_WINDOWS  // Look for either path separator in Windows
+  if (!base)
+    base = strrchr(filepath, '\\');
+#endif
+  return base ? (base+1) : filepath;
+}

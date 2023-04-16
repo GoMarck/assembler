@@ -69,6 +69,5 @@ uint64_t str2uint64_range(const char *str, size_t beg, size_t end) {
   return negative ? -ret : ret;
 
 fail_handle:
-  printf("Parse string to number failed: %s\n", str);
-  abort();
+  LOG(FATAL, "Parse string to number failed: [%s]", str);
 }

@@ -25,18 +25,18 @@ char message_text[MAX_LOG_MESSAGE_LEN + 1];
 
 #define LOG_LEVEL INFO
 
-#define LOG_TO_STDERR(level, ...)                                       \
-  do {                                                                  \
-    if (level < LOG_LEVEL) {                                            \
-      break;                                                            \
-    }                                                                   \
-    log_to_stderr(message_prefix, sizeof(message_prefix), "%s %s:%d] ", \
-                  level_to_str(level), __FILE__, __LINE__);             \
-    log_to_stderr(message_text, sizeof(message_text), __VA_ARGS__);     \
-    log_tail("\n");                                                     \
-    if (level == FATAL) {                                               \
-      abort();                                                          \
-    }                                                                   \
+#define LOG_TO_STDERR(level, ...)                                           \
+  do {                                                                      \
+    if (level < LOG_LEVEL) {                                                \
+      break;                                                                \
+    }                                                                       \
+    log_to_stderr(message_prefix, sizeof(message_prefix), "%s %s:%d] ",     \
+                  level_to_str(level), const_basename(__FILE__), __LINE__); \
+    log_to_stderr(message_text, sizeof(message_text), __VA_ARGS__);         \
+    log_tail("\n");                                                         \
+    if (level == FATAL) {                                                   \
+      abort();                                                              \
+    }                                                                       \
   } while (0)
 
 #define STDERR_LOG_VERBOSE(...) LOG_TO_STDERR(VERBOSE, __VA_ARGS__)
@@ -78,5 +78,6 @@ char message_text[MAX_LOG_MESSAGE_LEN + 1];
 const char *level_to_str(LogLevel level);
 void log_to_stderr(char *buf, size_t len, const char *format, ...);
 void log_tail(const char *buf);
+const char* const_basename(const char* filepath);
 
 #endif  // ASSEMBLER_LOG_H
