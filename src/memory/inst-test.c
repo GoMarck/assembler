@@ -421,9 +421,129 @@ TEST_BEGIN(test_parse_instruction_str) {
 }
 TEST_END
 
+TEST_BEGIN(test_add_operation_flags) {
+  init_handler_table();
+  handler_t handler = handler_table[ADD];
+  operand_t src;
+  src.type = REG;
+  src.reg_b = &core.reg.rdi;
+
+  operand_t dst;
+  dst.type = REG;
+  dst.reg_b = &core.reg.rax;
+
+  // bitmap: OF|SF|ZF|CF
+  // CF: Unsigned overflow
+  // ZF: Zero
+  // SF: Negative
+  // OF: Signed overflow
+
+  // Test unsigned overflow flag.
+  *src.reg_b = 0xffffffffffffffff;
+  *dst.reg_b = 0x10;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0x1);
+  EXPECT_U32_EQ(CF_RD(&core), true);
+  EXPECT_U32_EQ(ZF_RD(&core), false);
+  EXPECT_U32_EQ(SF_RD(&core), false);
+  EXPECT_U32_EQ(OF_RD(&core), false);
+
+  // Test unsigned overflow and zero flag.
+  *src.reg_b = 0xffffffffffffffff;
+  *dst.reg_b = 0x1;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0x3);
+  EXPECT_U32_EQ(CF_RD(&core), true);
+  EXPECT_U32_EQ(ZF_RD(&core), true);
+  EXPECT_U32_EQ(SF_RD(&core), false);
+  EXPECT_U32_EQ(OF_RD(&core), false);
+
+  // Test negative flag.
+  *src.reg_b = 0xffffffffffffff00;
+  *dst.reg_b = 0xf0;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0x4);
+  EXPECT_U32_EQ(CF_RD(&core), false);
+  EXPECT_U32_EQ(ZF_RD(&core), false);
+  EXPECT_U32_EQ(SF_RD(&core), true);
+  EXPECT_U32_EQ(OF_RD(&core), false);
+
+  // Test signed overflow flag.
+  *src.reg_b = 0x7fffffffffffffff;
+  *dst.reg_b = 0x1;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0xc);
+  EXPECT_U32_EQ(CF_RD(&core), false);
+  EXPECT_U32_EQ(ZF_RD(&core), false);
+  EXPECT_U32_EQ(SF_RD(&core), true);
+  EXPECT_U32_EQ(OF_RD(&core), true);
+}
+TEST_END
+
+TEST_BEGIN(test_sub_operation_flags) {
+  init_handler_table();
+  handler_t handler = handler_table[SUB];
+  operand_t src;
+  src.type = REG;
+  src.reg_b = &core.reg.rdi;
+
+  operand_t dst;
+  dst.type = REG;
+  dst.reg_b = &core.reg.rax;
+
+  // bitmap: OF|SF|ZF|CF
+  // CF: Unsigned overflow
+  // ZF: Zero
+  // SF: Negative
+  // OF: Signed overflow
+
+  // Test unsigned overflow flag.
+  *src.reg_b = -0x10;
+  *dst.reg_b = 0xffffffffffffffff;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0x1);
+  EXPECT_U32_EQ(CF_RD(&core), true);
+  EXPECT_U32_EQ(ZF_RD(&core), false);
+  EXPECT_U32_EQ(SF_RD(&core), false);
+  EXPECT_U32_EQ(OF_RD(&core), false);
+
+  // Test unsigned overflow and zero flag.
+  *src.reg_b = -0x1;
+  *dst.reg_b = 0xffffffffffffffff;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0x3);
+  EXPECT_U32_EQ(CF_RD(&core), true);
+  EXPECT_U32_EQ(ZF_RD(&core), true);
+  EXPECT_U32_EQ(SF_RD(&core), false);
+  EXPECT_U32_EQ(OF_RD(&core), false);
+
+  // Test negative flag.
+  *src.reg_b = -0xf0;
+  *dst.reg_b = 0xffffffffffffff00;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0x4);
+  EXPECT_U32_EQ(CF_RD(&core), false);
+  EXPECT_U32_EQ(ZF_RD(&core), false);
+  EXPECT_U32_EQ(SF_RD(&core), true);
+  EXPECT_U32_EQ(OF_RD(&core), false);
+
+  // Test signed overflow flag.
+  *src.reg_b = -0x1;
+  *dst.reg_b = 0x7fffffffffffffff;
+  handler(&src, &dst);
+  EXPECT_U32_EQ(core.codes, 0xc);
+  EXPECT_U32_EQ(CF_RD(&core), false);
+  EXPECT_U32_EQ(ZF_RD(&core), false);
+  EXPECT_U32_EQ(SF_RD(&core), true);
+  EXPECT_U32_EQ(OF_RD(&core), true);
+}
+TEST_END
+
 int main(void) {
   return RUN_TESTS(test_parse_immediate_operand_type,
                    test_parse_register_operand_type,
                    test_parse_memory_operand_type, 
-                   test_parse_instruction_str);
+                   test_parse_instruction_str,
+                   test_add_operation_flags,
+                   test_sub_operation_flags);
 }
