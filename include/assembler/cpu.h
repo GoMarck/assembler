@@ -84,13 +84,14 @@ typedef struct reg_t {
 //    * SF   (t < 0)                                Negative
 //    * OF   (a < 0 == b < 0) && (t < 0 != a < 0)   Signed overflow
 #define CF_RD(cp) BOOL((cp)->codes & 0x1)
-#define CF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)))
-#define ZF_RD(cp) BOOL((cp)->codes & 0x10)
-#define ZF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x1))
-#define SF_RD(cp) BOOL((cp)->codes & 0x100)
-#define SF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x10))
-#define OF_RD(cp) BOOL((cp)->codes & 0x1000)
-#define OF_WR(cp, flag) ((cp)->codes | BYTE(BOOL(flag)) << 0x100))
+#define CF_WR(cp, flag) ((cp)->codes |= BYTE(BOOL(flag)))
+#define ZF_RD(cp) BOOL((cp)->codes & 0x2)
+#define ZF_WR(cp, flag) ((cp)->codes |= BYTE(BOOL(flag)) << 0x1)
+#define SF_RD(cp) BOOL((cp)->codes & 0x4)
+#define SF_WR(cp, flag) ((cp)->codes |= BYTE(BOOL(flag)) << 0x2)
+#define OF_RD(cp) BOOL((cp)->codes & 0x8)
+#define OF_WR(cp, flag) ((cp)->codes |= BYTE(BOOL(flag)) << 0x3)
+#define CLEAR_FLAGS(cp) ((cp)->codes = 0)
 
 typedef struct core_t {
   reg_t reg;    // a set of 16 general-purpose registers

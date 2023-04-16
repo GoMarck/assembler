@@ -1,5 +1,6 @@
 #include "assembler/inst.h"
 
+#include <bits/stdint-uintn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,7 +60,35 @@ void mov_hander(operand_t *src, operand_t *dst) {
 }
 
 void add_handler(operand_t *src, operand_t *dst) {
-  set_operand_val(dst, get_operand_val(src) + get_operand_val(dst));
+  uint64_t src_val = get_operand_val(src);
+  uint64_t dst_val = get_operand_val(dst);
+  set_operand_val(dst, src_val + dst_val);
+  
+  // flags set
+  uint64_t res_val = get_operand_val(dst);
+  CLEAR_FLAGS(&core);
+  CF_WR(&core, res_val < src_val);
+  ZF_WR(&core, res_val == 0);
+  SF_WR(&core, res_val >> 0x3f);
+  OF_WR(&core, (((int64_t)src_val < 0) == ((int64_t)dst_val < 0)) && (((int64_t)res_val < 0) != ((int64_t)src_val < 0)));
+
+  RIP_UPDATE(&core);
+}
+
+void sub_handler(operand_t *src, operand_t *dst) {
+  uint64_t src_val = get_operand_val(src);
+  src_val = ~src_val + 1;
+  uint64_t dst_val = get_operand_val(dst);
+  set_operand_val(dst, src_val + dst_val);
+  
+  // flags set
+  uint64_t res_val = get_operand_val(dst);
+  CLEAR_FLAGS(&core);
+  CF_WR(&core, res_val < src_val);
+  ZF_WR(&core, res_val == 0);
+  SF_WR(&core, res_val >> 0x3f);
+  OF_WR(&core, (((int64_t)src_val < 0) == ((int64_t)dst_val < 0)) && (((int64_t)res_val < 0) != ((int64_t)src_val < 0)));
+
   RIP_UPDATE(&core);
 }
 
@@ -86,14 +115,49 @@ void pop_handler(operand_t *src, operand_t *dst) {
   RIP_UPDATE(&core);
 }
 
+void jmp_handler(operand_t *src, operand_t *dst) {
+  RIP_SET(&core, get_operand_val(src));
+}
+
+void jne_handler(operand_t *src, operand_t *dst) {
+  if (!ZF_RD(&core)) {
+    RIP_SET(&core, get_operand_val(src));
+  } else {
+    RIP_UPDATE(&core);
+  }
+}
+
+// leave equals to:
+// movq %rbp, %rsp Set stack pointer to beginning of frame
+// popq %rbp       Restore saved %rbp and set stack ptr to 
+//                 end of caller’s frame
+void leave_handler(operand_t *src, operand_t *dst) {
+  operand_t rbp_od;
+  rbp_od.reg_b = &core.reg.rbp;
+  rbp_od.type = REG;
+
+  operand_t rsp_od;
+  rsp_od.reg_b = &core.reg.rsp;
+  rsp_od.type = REG;
+
+  set_operand_val(&rsp_od, get_operand_val(&rbp_od));
+  set_operand_val(&rbp_od, dram_read(va2pa(core.reg.rsp)));
+  core.reg.rsp += 0x8;
+  RIP_UPDATE(&core);
+}
+
 // init instruction handler table.
 void init_handler_table() {
   handler_table[MOV] = &mov_hander;
   handler_table[ADD] = &add_handler;
+  handler_table[SUB] = &sub_handler;
   handler_table[CALL] = &call_handler;
   handler_table[RET] = &ret_handler;
   handler_table[PUSH] = &push_handler;
   handler_table[POP] = &pop_handler;
+  handler_table[JMP] = &jmp_handler;
+  handler_table[JNE] = &jne_handler;
+  handler_table[LEAVE] = &leave_handler;
 }
 
 void parse_instruction() {

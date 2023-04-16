@@ -83,6 +83,43 @@ int main()
     return 0;
 }
 ```
+Its assembly instructions are show as follow:
+```asm
+0000000000001129 <sum>:
+    1129:       f3 0f 1e fa             endbr64 
+    112d:       55                      push   %rbp
+    112e:       48 89 e5                mov    %rsp,%rbp
+    1131:       48 83 ec 10             sub    $0x10,%rsp
+    1135:       48 89 7d f8             mov    %rdi,-0x8(%rbp)
+    1139:       48 83 7d f8 00          cmpq   $0x0,-0x8(%rbp)
+    113e:       75 07                   jne    1147 <sum+0x1e>
+    1140:       b8 00 00 00 00          mov    $0x0,%eax
+    1145:       eb 17                   jmp    115e <sum+0x35>
+    1147:       48 8b 45 f8             mov    -0x8(%rbp),%rax
+    114b:       48 83 e8 01             sub    $0x1,%rax
+    114f:       48 89 c7                mov    %rax,%rdi
+    1152:       e8 d2 ff ff ff          callq  1129 <sum>
+    1157:       48 8b 55 f8             mov    -0x8(%rbp),%rdx
+    115b:       48 01 d0                add    %rdx,%rax
+    115e:       c9                      leaveq 
+    115f:       c3                      retq   
+
+0000000000001160 <main>:
+    1160:       f3 0f 1e fa             endbr64 
+    1164:       55                      push   %rbp
+    1165:       48 89 e5                mov    %rsp,%rbp
+    1168:       48 83 ec 10             sub    $0x10,%rsp
+    116c:       bf 03 00 00 00          mov    $0x3,%edi
+    1171:       e8 b3 ff ff ff          callq  1129 <sum>
+    1176:       48 89 45 f8             mov    %rax,-0x8(%rbp)
+    117a:       b8 00 00 00 00          mov    $0x0,%eax
+    117f:       c9                      leaveq 
+    1180:       c3                      retq   
+```
+
+Waht's new here:
+1. Need to set the flags like CF/ZF/SF/OF to support the jump instruction.
+2. Implement the instruction like jmp, jne, leave and sub.
 
 ## Some useful link
 - [Google C++ style guide [EN]](https://google.github.io/styleguide/cppguide.html)
