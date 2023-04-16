@@ -9,6 +9,21 @@
 
 #define CODE_SIZE 20
 
+// This is the assembly code translated from a simple C program:
+//
+// int64_t add(int64_t a, int64_t b)
+// {
+//     int64_t c = a + b;
+//     return c;
+// }
+
+// int64_t main()
+// {
+//     int64_t a = 0x12340000;
+//     int64_t b = 0xabcd;
+//     int64_t c = add(a, b);
+//     return 0;
+// }
 char assembly_code[CODE_SIZE][INSTRUCTION_SIZE] = {
   // add
   "push   %rbp",

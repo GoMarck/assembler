@@ -29,11 +29,12 @@ set (SRCS
   src/memory/inst.c
   src/util/log.c
   src/util/convert.c
-  src/main.c)
-
-add_executable (assembler ${SRCS})
+  )
 
 add_library(assembler_lib STATIC ${SRCS})
+
+add_executable (assembler src/main.c)
+target_link_libraries(assembler assembler_lib)
 
 ###################################################################
 #                            TEST ZONE                            #                        
@@ -64,7 +65,6 @@ add_library(assembler_lib STATIC ${SRCS})
 #
 #       If this test need to be built after targets and we need to
 #       add dependiences as shown, this args would be helpful.
-
 function (ADD_ASSEMBLER_TEST TEST_NAME)
   # Parse out properities for which we have special handling.
   set (options)
@@ -105,7 +105,7 @@ if (WITH_TEST)
   # add instruction test.
   ADD_ASSEMBLER_TEST (inst-test SRC_FILES src/memory/inst-test.c DEP_LIBS assembler_lib)
   # add convert test.
-  ADD_ASSEMBLER_TEST (convert-test SRC_FILES src/util/convert-test.c src/util/convert.c src/util/log.c)
+  ADD_ASSEMBLER_TEST (convert-test SRC_FILES src/util/convert-test.c DEP_LIBS assembler_lib)
   # add assembler test
   ADD_ASSEMBLER_TEST (add-test SRC_FILES test/st/add.c DEP_LIBS assembler_lib)
 endif ()
