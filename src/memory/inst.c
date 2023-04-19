@@ -1,6 +1,5 @@
 #include "assembler/inst.h"
 
-#include <bits/stdint-uintn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +15,8 @@
 
 static uint64_t get_mem_addr(operand_t *od) {
   if (od->type != MEM) {
-    LOG(FATAL, "Error occured when get operand memory address, type: %d", od->type);
+    LOG(FATAL, "Error occured when get operand memory address, type: %d",
+        od->type);
   }
   uint64_t addr = od->imm;
   if (od->reg_b != NULL) {
@@ -61,14 +61,15 @@ void add_handler(operand_t *src, operand_t *dst) {
   uint64_t src_val = get_operand_val(src);
   uint64_t dst_val = get_operand_val(dst);
   set_operand_val(dst, src_val + dst_val);
-  
+
   // flags set
   uint64_t res_val = get_operand_val(dst);
   CLEAR_FLAGS(&core);
   CF_WR(&core, res_val < src_val);
   ZF_WR(&core, res_val == 0);
   SF_WR(&core, res_val >> 0x3f);
-  OF_WR(&core, (((int64_t)src_val < 0) == ((int64_t)dst_val < 0)) && (((int64_t)res_val < 0) != ((int64_t)src_val < 0)));
+  OF_WR(&core, (((int64_t)src_val < 0) == ((int64_t)dst_val < 0)) &&
+               (((int64_t)res_val < 0) != ((int64_t)src_val < 0)));
 
   RIP_UPDATE(&core);
 }
@@ -78,14 +79,15 @@ void sub_handler(operand_t *src, operand_t *dst) {
   src_val = ~src_val + 1;
   uint64_t dst_val = get_operand_val(dst);
   set_operand_val(dst, src_val + dst_val);
-  
+
   // flags set
   uint64_t res_val = get_operand_val(dst);
   CLEAR_FLAGS(&core);
   CF_WR(&core, res_val < src_val);
   ZF_WR(&core, res_val == 0);
   SF_WR(&core, res_val >> 0x3f);
-  OF_WR(&core, (((int64_t)src_val < 0) == ((int64_t)dst_val < 0)) && (((int64_t)res_val < 0) != ((int64_t)src_val < 0)));
+  OF_WR(&core, (((int64_t)src_val < 0) == ((int64_t)dst_val < 0)) &&
+               (((int64_t)res_val < 0) != ((int64_t)src_val < 0)));
 
   RIP_UPDATE(&core);
 }
@@ -127,7 +129,7 @@ void jne_handler(operand_t *src, operand_t *dst) {
 
 // leave equals to:
 // movq %rbp, %rsp Set stack pointer to beginning of frame
-// popq %rbp       Restore saved %rbp and set stack ptr to 
+// popq %rbp       Restore saved %rbp and set stack ptr to
 //                 end of caller’s frame
 void leave_handler(operand_t *src, operand_t *dst) {
   operand_t rbp_od;
@@ -252,43 +254,49 @@ void parse_operation(const char *str, op_t *op) {
 
 // TODO: very low performance, need optimize.
 static const char *reg_name_table[64] = {
-  "%rax", "%eax",  "%ax",   "%al",
-  "%rbx", "%ebx",  "%bx",   "%bl",
-  "%rcx", "%ecx",  "%cx",   "%cl",
-  "%rdx", "%edx",  "%dx",   "%dl",
-  "%rsi", "%esi",  "%si",   "%sil",
-  "%rdi", "%edi",  "%di",   "%dil",
-  "%rbp", "%ebp",  "%bp",   "%bpl",
-  "%rsp", "%esp",  "%sp",   "%spl",
-  "%r8",  "%r8d",  "%r8w",  "%r8b",
-  "%r9",  "%r9d",  "%r9w",  "%r9b",
-  "%r10", "%r1d",  "%r10w", "%r10b",
-  "%r11", "%r11d", "%r11w", "%r11b",
-  "%r12", "%r12d", "%r12w", "%r12b",
-  "%r13", "%r13d", "%r13w", "%r13b",
-  "%r14", "%r14d", "%r14w", "%r14b",
-  "%r15", "%r15d", "%r15w", "%r15b"
-};
+    "%rax", "%eax",  "%ax",   "%al",   "%rbx", "%ebx",  "%bx",   "%bl",
+    "%rcx", "%ecx",  "%cx",   "%cl",   "%rdx", "%edx",  "%dx",   "%dl",
+    "%rsi", "%esi",  "%si",   "%sil",  "%rdi", "%edi",  "%di",   "%dil",
+    "%rbp", "%ebp",  "%bp",   "%bpl",  "%rsp", "%esp",  "%sp",   "%spl",
+    "%r8",  "%r8d",  "%r8w",  "%r8b",  "%r9",  "%r9d",  "%r9w",  "%r9b",
+    "%r10", "%r1d",  "%r10w", "%r10b", "%r11", "%r11d", "%r11w", "%r11b",
+    "%r12", "%r12d", "%r12w", "%r12b", "%r13", "%r13d", "%r13w", "%r13b",
+    "%r14", "%r14d", "%r14w", "%r14b", "%r15", "%r15d", "%r15w", "%r15b"};
 
 static uint64_t *reflect_register(const char *str, core_t *cr) {
   uint64_t *reg_addr_table[64] = {
-    (uint64_t *)&cr->reg.rax, (uint64_t *)&cr->reg.eax,  (uint64_t *)&cr->reg.ax,   (uint64_t *)&cr->reg.al,
-    (uint64_t *)&cr->reg.rbx, (uint64_t *)&cr->reg.ebx,  (uint64_t *)&cr->reg.bx,   (uint64_t *)&cr->reg.bl,
-    (uint64_t *)&cr->reg.rcx, (uint64_t *)&cr->reg.ecx,  (uint64_t *)&cr->reg.cx,   (uint64_t *)&cr->reg.cl,
-    (uint64_t *)&cr->reg.rdx, (uint64_t *)&cr->reg.edx,  (uint64_t *)&cr->reg.dx,   (uint64_t *)&cr->reg.dl,
-    (uint64_t *)&cr->reg.rsi, (uint64_t *)&cr->reg.esi,  (uint64_t *)&cr->reg.si,   (uint64_t *)&cr->reg.sil,
-    (uint64_t *)&cr->reg.rdi, (uint64_t *)&cr->reg.edi,  (uint64_t *)&cr->reg.di,   (uint64_t *)&cr->reg.dil,
-    (uint64_t *)&cr->reg.rbp, (uint64_t *)&cr->reg.ebp,  (uint64_t *)&cr->reg.bp,   (uint64_t *)&cr->reg.bpl,
-    (uint64_t *)&cr->reg.rsp, (uint64_t *)&cr->reg.esp,  (uint64_t *)&cr->reg.sp,   (uint64_t *)&cr->reg.spl,
-    (uint64_t *)&cr->reg.r8,  (uint64_t *)&cr->reg.r8d,  (uint64_t *)&cr->reg.r8w,  (uint64_t *)&cr->reg.r8b,
-    (uint64_t *)&cr->reg.r9,  (uint64_t *)&cr->reg.r9d,  (uint64_t *)&cr->reg.r9w,  (uint64_t *)&cr->reg.r9b,
-    (uint64_t *)&cr->reg.r10, (uint64_t *)&cr->reg.r10d, (uint64_t *)&cr->reg.r10w, (uint64_t *)&cr->reg.r10b,
-    (uint64_t *)&cr->reg.r11, (uint64_t *)&cr->reg.r11d, (uint64_t *)&cr->reg.r11w, (uint64_t *)&cr->reg.r11b,
-    (uint64_t *)&cr->reg.r12, (uint64_t *)&cr->reg.r12d, (uint64_t *)&cr->reg.r12w, (uint64_t *)&cr->reg.r12b,
-    (uint64_t *)&cr->reg.r13, (uint64_t *)&cr->reg.r13d, (uint64_t *)&cr->reg.r13w, (uint64_t *)&cr->reg.r13b,
-    (uint64_t *)&cr->reg.r14, (uint64_t *)&cr->reg.r14d, (uint64_t *)&cr->reg.r14w, (uint64_t *)&cr->reg.r14b,
-    (uint64_t *)&cr->reg.r15, (uint64_t *)&cr->reg.r15d, (uint64_t *)&cr->reg.r15w, (uint64_t *)&cr->reg.r15b
-  };
+      (uint64_t *)&cr->reg.rax,  (uint64_t *)&cr->reg.eax,
+      (uint64_t *)&cr->reg.ax,   (uint64_t *)&cr->reg.al,
+      (uint64_t *)&cr->reg.rbx,  (uint64_t *)&cr->reg.ebx,
+      (uint64_t *)&cr->reg.bx,   (uint64_t *)&cr->reg.bl,
+      (uint64_t *)&cr->reg.rcx,  (uint64_t *)&cr->reg.ecx,
+      (uint64_t *)&cr->reg.cx,   (uint64_t *)&cr->reg.cl,
+      (uint64_t *)&cr->reg.rdx,  (uint64_t *)&cr->reg.edx,
+      (uint64_t *)&cr->reg.dx,   (uint64_t *)&cr->reg.dl,
+      (uint64_t *)&cr->reg.rsi,  (uint64_t *)&cr->reg.esi,
+      (uint64_t *)&cr->reg.si,   (uint64_t *)&cr->reg.sil,
+      (uint64_t *)&cr->reg.rdi,  (uint64_t *)&cr->reg.edi,
+      (uint64_t *)&cr->reg.di,   (uint64_t *)&cr->reg.dil,
+      (uint64_t *)&cr->reg.rbp,  (uint64_t *)&cr->reg.ebp,
+      (uint64_t *)&cr->reg.bp,   (uint64_t *)&cr->reg.bpl,
+      (uint64_t *)&cr->reg.rsp,  (uint64_t *)&cr->reg.esp,
+      (uint64_t *)&cr->reg.sp,   (uint64_t *)&cr->reg.spl,
+      (uint64_t *)&cr->reg.r8,   (uint64_t *)&cr->reg.r8d,
+      (uint64_t *)&cr->reg.r8w,  (uint64_t *)&cr->reg.r8b,
+      (uint64_t *)&cr->reg.r9,   (uint64_t *)&cr->reg.r9d,
+      (uint64_t *)&cr->reg.r9w,  (uint64_t *)&cr->reg.r9b,
+      (uint64_t *)&cr->reg.r10,  (uint64_t *)&cr->reg.r10d,
+      (uint64_t *)&cr->reg.r10w, (uint64_t *)&cr->reg.r10b,
+      (uint64_t *)&cr->reg.r11,  (uint64_t *)&cr->reg.r11d,
+      (uint64_t *)&cr->reg.r11w, (uint64_t *)&cr->reg.r11b,
+      (uint64_t *)&cr->reg.r12,  (uint64_t *)&cr->reg.r12d,
+      (uint64_t *)&cr->reg.r12w, (uint64_t *)&cr->reg.r12b,
+      (uint64_t *)&cr->reg.r13,  (uint64_t *)&cr->reg.r13d,
+      (uint64_t *)&cr->reg.r13w, (uint64_t *)&cr->reg.r13b,
+      (uint64_t *)&cr->reg.r14,  (uint64_t *)&cr->reg.r14d,
+      (uint64_t *)&cr->reg.r14w, (uint64_t *)&cr->reg.r14b,
+      (uint64_t *)&cr->reg.r15,  (uint64_t *)&cr->reg.r15d,
+      (uint64_t *)&cr->reg.r15w, (uint64_t *)&cr->reg.r15b};
   for (size_t i = 0; i < 64; ++i) {
     if (strcmp(str, reg_name_table[i]) == 0) {
       return reg_addr_table[i];
