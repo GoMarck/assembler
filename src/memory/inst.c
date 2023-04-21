@@ -239,6 +239,8 @@ void parse_operation(const char *str, op_t *op) {
     *op = MOV;
   } else if (strcmp(str, "add") == 0 || strcmp(str, "addq") == 0) {
     *op = ADD;
+  } else if (strcmp(str, "sub") == 0 || strcmp(str, "subq") == 0) {
+    *op = SUB;
   } else if (strcmp(str, "call") == 0 || strcmp(str, "callq") == 0) {
     *op = CALL;
   } else if (strcmp(str, "ret") == 0 || strcmp(str, "retq") == 0) {

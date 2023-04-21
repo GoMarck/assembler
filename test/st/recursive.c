@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "assembler/log.h"
 #include "assembler/cpu.h"
 #include "assembler/dram.h"
 #include "assembler/inst.h"
@@ -28,10 +29,10 @@
 // }
 char assembly_code[CODE_SIZE][INSTRUCTION_SIZE] = {
   // <sum>
-  "push   %rbp",
+  "push   %rbp",  // rsp - 8
   "mov    %rsp,%rbp",
-  "sub    $0x10,%rsp", rsp - 10
-  "mov    %rdi,-0x8(%rbp)", rsp - 8
+  "sub    $0x10,%rsp", // rsp - 10
+  "mov    %rdi,-0x8(%rbp)", // rsp - 8
   "cmpq   $0x0,-0x8(%rbp)",
   "jne    $0x00400200",
   "mov    $0x0,%rax",
@@ -45,11 +46,11 @@ char assembly_code[CODE_SIZE][INSTRUCTION_SIZE] = {
   "leaveq",
   "retq",
   // <main>
-  "push   %rbp",
+  "push   %rbp", // rsp - 8
   "mov    %rsp,%rbp",
-  "sub    $0x10,%rsp", rsp - 10
+  "sub    $0x10,%rsp", // rsp - 10
   "mov    $0x3,%rdi",
-  "callq  $0x00400000",
+  "callq  $0x00400000",  // rsp - 8
   "mov    %rax,-0x8(%rbp)",
   "mov    $0x0,%rax",
   "leaveq",
@@ -81,52 +82,106 @@ void init_memory() {
   dram_write(va2pa(core.reg.rsp - 0x58), 0xc2);            // n = 0 saved here
   dram_write(va2pa(core.reg.rsp - 0x48), 0x7ffffffede56);  // n = 1 saved here
   dram_write(va2pa(core.reg.rsp - 0x38), 0x7fffff7912e8);  // n = 2 saved here
-  dram_write(va2pa(core.reg.rsp - 0x28), 0x0);             // n = 3 saved here
-  dram_write(va2pa(core.reg.rsp - 0x8), 0x7fffff7912e8);
+  dram_write(va2pa(core.reg.rsp - 0x30), 0x80011dd);       // n = 3 saved here
+  dram_write(va2pa(core.reg.rsp - 0x20), 0x8001040);
+  dram_write(va2pa(core.reg.rsp - 0x8), 0x8001190);
   dram_write(va2pa(core.reg.rsp), 0x7fffff5c40b3);
 }
 
 // register compare list
 uint64_t rbp_cmp_list[CODE_SIZE] = {
-  0x0,
+  0x0, 0x7ffffffede70, 0x7ffffffede70, 0x7ffffffede70, 0x7ffffffede70,
+  0x7ffffffede70, 0x7ffffffede50, 0x7ffffffede50, 0x7ffffffede50
 };
 
 uint64_t rax_cmp_list[CODE_SIZE] = {
-  0x8001160,
+  0x8001160, 0x8001160, 0x8001160, 0x8001160, 0x8001160, 0x8001160,
+  0x8001160, 0x8001160, 0x8001160
 };
 
 uint64_t rdx_cmp_list[CODE_SIZE] = {
-  0x7ffffffedf78,
+  0x7ffffffedf78, 0x7ffffffedf78, 0x7ffffffedf78, 0x7ffffffedf78,
+  0x7ffffffedf78, 0x7ffffffedf78, 0x7ffffffedf78, 0x7ffffffedf78,
+  0x7ffffffedf78
 };
 
 uint64_t rdi_cmp_list[CODE_SIZE] = {
-  0x1,
+  0x1, 0x1, 0x1, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3
 };
 
 uint64_t rsi_cmp_list[CODE_SIZE] = {
-  0x7ffffffedf68,
+  0x7ffffffedf68, 0x7ffffffedf68, 0x7ffffffedf68, 0x7ffffffedf68, 
+  0x7ffffffedf68, 0x7ffffffedf68, 0x7ffffffedf68, 0x7ffffffedf68,
+  0x7ffffffedf68
 };
 
 uint64_t rsp_cmp_list[CODE_SIZE] = {
-  0x7ffffffede70,
+  0x7ffffffede70, 0x7ffffffede70, 0x7ffffffede60, 0x7ffffffede60, 
+  0x7ffffffede58, 0x7ffffffede50, 0x7ffffffede50, 0x7ffffffede40,
+  0x7ffffffede40
 };
 
 uint64_t rip_cmp_list[CODE_SIZE] = {
-  
+  0x00400440, 0x00400480, 0x004004c0, 0x00400500, 0x00400000,
+  0x00400040, 0x00400080, 0x004000c0, 0x00400100
 };
+
+void register_verify(int i) {
+  EXPECT_U64_EQ(core.reg.rbp, rbp_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rax, rax_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rdx, rdx_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rdi, rdi_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rsi, rsi_cmp_list[i]);
+  EXPECT_U64_EQ(core.reg.rsp, rsp_cmp_list[i]);
+  EXPECT_U64_EQ(core.rip, rip_cmp_list[i]);
+}
 
 // memory verify
 uint64_t mem_cmp_list[6][CODE_SIZE] = {
   // 0x7ffffffede70
   {
-    0x0, 
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,0x0
+  },
+  // 0x7ffffffede58
+  {
+    0x8001040, 0x8001040, 0x8001040, 0x8001040, 0x00400540,
+    0x00400540, 0x00400540, 0x00400540,0x00400540
   },
   // 0x7ffffffede50
   {
-    0x0, 
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x7ffffffede70, 0x7ffffffede70,
+    0x7ffffffede70, 0x7ffffffede70
   },
-  // 0x7ffffffede50
+  // 0x7ffffffede48
   {
-    0x0, 
-  },
+    0x80011dd, 0x80011dd, 0x80011dd, 0x80011dd, 0x80011dd, 
+    0x80011dd, 0x80011dd, 0x80011dd, 0x3
+  }
 };
+
+void memory_verify(int i) {
+  EXPECT_U64_EQ(dram_read(va2pa(0x7ffffffede70)), mem_cmp_list[0][i]);
+  EXPECT_U64_EQ(dram_read(va2pa(0x7ffffffede58)), mem_cmp_list[1][i]);
+  EXPECT_U64_EQ(dram_read(va2pa(0x7ffffffede50)), mem_cmp_list[2][i]);
+  EXPECT_U64_EQ(dram_read(va2pa(0x7ffffffede48)), mem_cmp_list[3][i]);
+}
+
+void instruction_cycle() {
+  for (int i = 0; i < 9; ++i) {
+    parse_instruction();
+    register_verify(i);
+    memory_verify(i);
+  }
+}
+
+TEST_BEGIN(recursive_assembler_code_st) {
+  init_handler_table();
+  init_register();
+  init_memory();
+  instruction_cycle();
+}
+TEST_END
+
+int main(void) {
+  return RUN_TESTS(recursive_assembler_code_st); 
+}

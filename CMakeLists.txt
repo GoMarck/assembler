@@ -108,4 +108,5 @@ if (WITH_TEST)
   ADD_ASSEMBLER_TEST (convert-test SRC_FILES src/util/convert-test.c DEP_LIBS assembler_lib)
   # add assembler test
   ADD_ASSEMBLER_TEST (add-test SRC_FILES test/st/add.c DEP_LIBS assembler_lib)
+  ADD_ASSEMBLER_TEST (recursive-test SRC_FILES test/st/recursive.c DEP_LIBS assembler_lib)
 endif ()
