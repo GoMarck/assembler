@@ -7,7 +7,7 @@
 
 #include "assembler/cpu.h"
 
-#define OP_SIZE 10
+#define OP_SIZE 11
 #define INSTRUCTION_SIZE 64
 
 typedef enum OperandType { NUL, IMM, REG, MEM } OperandType;
@@ -32,7 +32,8 @@ typedef enum op_t {
   POP,
   JMP,
   JNE,
-  LEAVE
+  LEAVE,
+  CMP
 } op_t;
 
 // define instruction. e.g. mov %rdx, %rdi

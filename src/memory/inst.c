@@ -146,6 +146,22 @@ void leave_handler(operand_t *src, operand_t *dst) {
   RIP_UPDATE(&core);
 }
 
+void cmp_handler(operand_t *src, operand_t *dst) {
+  uint64_t src_val = get_operand_val(src);
+  src_val = ~src_val + 1;
+  uint64_t dst_val = get_operand_val(dst);
+  uint64_t res_val = src_val + dst_val;
+
+  // flags set
+  CLEAR_FLAGS(&core);
+  CF_WR(&core, res_val < src_val);
+  ZF_WR(&core, res_val == 0);
+  SF_WR(&core, res_val >> 0x3f);
+  OF_WR(&core, (((int64_t)src_val < 0) == ((int64_t)dst_val < 0)) &&
+               (((int64_t)res_val < 0) != ((int64_t)src_val < 0)));
+  RIP_UPDATE(&core);
+}
+
 // init instruction handler table.
 void init_handler_table() {
   handler_table[MOV] = &mov_hander;
@@ -158,6 +174,7 @@ void init_handler_table() {
   handler_table[JMP] = &jmp_handler;
   handler_table[JNE] = &jne_handler;
   handler_table[LEAVE] = &leave_handler;
+  handler_table[CMP] = &cmp_handler;
 }
 
 void parse_instruction() {
@@ -249,6 +266,14 @@ void parse_operation(const char *str, op_t *op) {
     *op = PUSH;
   } else if (strcmp(str, "pop") == 0 || strcmp(str, "popq") == 0) {
     *op = POP;
+  } else if (strcmp(str, "jmp") == 0) {
+    *op = JMP;
+  } else if (strcmp(str, "jne") == 0) {
+    *op = JNE;
+  } else if (strcmp(str, "leave") == 0 || strcmp(str, "leaveq") == 0) {
+    *op = LEAVE;
+  } else if (strcmp(str, "cmpq") == 0) {
+    *op = CMP;
   } else {
     LOG(FATAL, "Error operation: [%s]", str);
   }
