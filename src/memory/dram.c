@@ -1,5 +1,6 @@
 #include "assembler/dram.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #define SRAM_CACHE 0
