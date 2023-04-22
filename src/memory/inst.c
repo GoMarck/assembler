@@ -52,7 +52,7 @@ static void set_operand_val(operand_t *od, uint64_t val) {
   }
 }
 
-void mov_hander(operand_t *src, operand_t *dst) {
+void mov_handler(operand_t *src, operand_t *dst) {
   set_operand_val(dst, get_operand_val(src));
   RIP_UPDATE(&core);
 }
@@ -164,7 +164,7 @@ void cmp_handler(operand_t *src, operand_t *dst) {
 
 // init instruction handler table.
 void init_handler_table() {
-  handler_table[MOV] = &mov_hander;
+  handler_table[MOV] = &mov_handler;
   handler_table[ADD] = &add_handler;
   handler_table[SUB] = &sub_handler;
   handler_table[CALL] = &call_handler;
