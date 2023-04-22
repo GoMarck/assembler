@@ -23,7 +23,7 @@ char message_prefix[MAX_LOG_MESSAGE_PREFIX_LEN + 1];
 // so the thread local optimize is not required.
 char message_text[MAX_LOG_MESSAGE_LEN + 1];
 
-#define LOG_LEVEL VERBOSE
+#define LOG_LEVEL INFO
 
 #define LOG_TO_STDERR(level, ...)                                           \
   do {                                                                      \
