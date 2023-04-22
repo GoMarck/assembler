@@ -6,7 +6,7 @@ The project is reference from: [yangminz
 /bcst_csapp](https://github.com/yangminz/bcst_csapp). Thanks to [yangminz](https://github.com/yangminz), I learn a lot from the project and his lesson in [bilibili](https://space.bilibili.com/4564101/video). And we obey the [Google C++ style guide](https://google.github.io/styleguide/cppguide.html).
 
 ## What I achieved
-I have successfully implement an assembler emulator to parse a very simple C codes:
+I have successfully implement an assembler emulator to parse two very simple C codes:
 ```c
 #include <stdint.h>
 
@@ -52,19 +52,9 @@ Its assembly instructions are show as follow:
     117d:       48 89 45 f8             mov    %rax,-0x8(%rbp)
     1181:       b8 00 00 00 00          mov    $0x0,%eax
 ```
-I manually parsed its assembly instructions and simply simulated the state of its CPU and memory. And it has been success.
-## TODO List
-Based on the features we have implemented, we want to implement these features in the future:
-- ~~Find a favorite C style guide and follow it.~~
-- ~~We need a story folder to place some design documents.~~
-- ~~Find a C ut framework to test the codes.~~
-- ~~Refactor the project to make the hierarchy more reasonable.~~
-- ~~Implement an instruction set string parsing state machine.~~
-- Implement SRAM cache function.
-- Implement MMU(Memory Manager Unit) function.
-- Implement the linking function.
+I manually parsed its assembly instructions and simply simulated the state of its CPU and memory. And it run success and verified.
 
-Our next target is implement the codes as follow:
+Another C codes is shown as below:
 ```c
 #include <stdint.h>
 
@@ -116,10 +106,16 @@ Its assembly instructions are show as follow:
     117f:       c9                      leaveq 
     1180:       c3                      retq   
 ```
+I have successfully simulated the call of a recursive function. Compared with the add function, it has more jump instructions and conditional code implementations, and it run success and verified too.
 
-Waht's new here:
-1. Need to set the flags like CF/ZF/SF/OF to support the jump instruction.
-2. Implement the instruction like jmp, jne, leave and sub.
+## TODO List
+Based on the features we have implemented, we want to implement these features in the future:
+- Implement the linking function.
+- Improve the design documentation.
+- Provide a more efficient test framework, ST testing currently takes too long.
+- Optimize instruction set string parsing algorithm, which is now very inefficient.
+- Implement SRAM cache function.
+- Implement MMU(Memory Manager Unit) function.
 
 ## Some useful link
 - [Google C++ style guide [EN]](https://google.github.io/styleguide/cppguide.html)
